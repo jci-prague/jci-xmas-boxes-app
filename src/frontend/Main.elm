@@ -45,28 +45,36 @@ update msg model =
     case msg of
         SetBottomThreshold threshold ->
             { model | bottomThreshold = threshold
-            , viewableFamilies = (updateViewableFamilies threshold model.topThreshold model.families)
+            , viewableFamilies = (updateViewableFamilies threshold model.topThreshold model.selectedGender model.families)
             }
         SetTopThreshold threshold ->
             { model | topThreshold = threshold
-            , viewableFamilies = (updateViewableFamilies model.bottomThreshold threshold model.families)
+            , viewableFamilies = (updateViewableFamilies model.bottomThreshold threshold model.selectedGender model.families)
             }
         SetGender gender ->
-          { model | selectedGender = gender }
+          { model | selectedGender = gender
+          , viewableFamilies = (updateViewableFamilies model.bottomThreshold model.topThreshold gender model.families)
+          }
         None ->
             model
 
 
-updateViewableFamilies : Int -> Int -> List Family -> List Family
-updateViewableFamilies bottom top families =
+updateViewableFamilies : Int -> Int -> Gender ->List Family -> List Family
+updateViewableFamilies bottom top gender families =
     List.filter
-        (\f -> (anyChildInAgeRange bottom top f))
+        (\f -> (anyChildInAgeRangeAndGender bottom top gender f))
         families
 
 
-anyChildInAgeRange : Int -> Int -> Family -> Bool
-anyChildInAgeRange bottom top family =
-    List.any (\child -> (child.age >= bottom && child.age <= top)) family.children
+anyChildInAgeRangeAndGender : Int -> Int -> Gender -> Family -> Bool
+anyChildInAgeRangeAndGender bottom top gender family =
+    List.any
+        (\child ->
+           ( child.age >= bottom && child.age <= top )
+           &&
+           ( gender == NotImportant || child.gender == gender )
+        )
+        family.children
 
 
 view : Model -> Html Msg
