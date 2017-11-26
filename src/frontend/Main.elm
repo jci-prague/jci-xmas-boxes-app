@@ -25,6 +25,7 @@ type alias Family =
 
 type alias Model =
     { families : List Family
+    , viewvableFamilies : List Family
     , bottomThreshold: Int
     , topThreshold: Int
     }
@@ -97,7 +98,7 @@ viewFamilies model =
                         [ (viewFamily f) ]
                     )
                 )
-                model.families
+                model.viewvableFamilies
             )
         ]
 
@@ -125,15 +126,19 @@ classForGender child =
 
 initialModel : Model
 initialModel =
-    { families =
+    { families = initialFamilies
+    , viewvableFamilies = initialFamilies
+    , bottomThreshold = 1
+    , topThreshold = 17
+    }
+
+
+initialFamilies =
         [ familyJimm
         , familyEmaJohny
         , familyMary
         , familyJessie
         ]
-    , bottomThreshold = 1
-    , topThreshold = 17
-    }
 
 
 update : Msg -> (Model -> Model)
