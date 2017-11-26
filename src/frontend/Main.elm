@@ -42,19 +42,26 @@ update msg model =
     case msg of
         SetBottomThreshold threshold ->
             { model | bottomThreshold = threshold
-            , viewableFamilies = (updateViewableFamilies model)
+            , viewableFamilies = (updateViewableFamilies threshold model.topThreshold model.families)
             }
         SetTopThreshold threshold ->
             { model | topThreshold = threshold
-            , viewableFamilies = (updateViewableFamilies model)
+            , viewableFamilies = (updateViewableFamilies model.bottomThreshold threshold model.families)
             }
         None ->
             model
 
 
-updateViewableFamilies : Model -> List Family
-updateViewableFamilies model =
-    model.families
+updateViewableFamilies : Int -> Int -> List Family -> List Family
+updateViewableFamilies bottom top families =
+    List.filter
+        (\f -> (anyChildInAgeRange bottom top f))
+        families
+
+
+anyChildInAgeRange : Int -> Int -> Family -> Bool
+anyChildInAgeRange bottom top family =
+    List.any (\child -> (child.age >= bottom && child.age <= top)) family.children
 
 
 view : Model -> Html Msg
