@@ -9,6 +9,7 @@ import List exposing (..)
 type Gender
     = Male
     | Female
+    | NotImportant
 
 
 type alias Child =
@@ -28,12 +29,14 @@ type alias Model =
     , viewableFamilies : List Family
     , bottomThreshold: Int
     , topThreshold: Int
+    , selectedGender: Gender
     }
 
 
 type Msg
     = SetBottomThreshold Int
     | SetTopThreshold Int
+    | SetGender Gender
     | None
 
 
@@ -48,6 +51,8 @@ update msg model =
             { model | topThreshold = threshold
             , viewableFamilies = (updateViewableFamilies model.bottomThreshold threshold model.families)
             }
+        SetGender gender ->
+          { model | selectedGender = gender }
         None ->
             model
 
@@ -79,6 +84,9 @@ filterFormView model =
           [ span [] [text "Věk: "]
           , span []
               [ (text ((toString model.bottomThreshold) ++ " - " ++ (toString model.topThreshold)))
+              ]
+          , span []
+              [ text ("(" ++ (toString model.selectedGender) ++ ")")
               ]
           ]
       , div [] 
@@ -118,6 +126,12 @@ filterFormView model =
           , button [ onClick (SetTopThreshold 15) ] [ text "15" ]
           , button [ onClick (SetTopThreshold 16) ] [ text "16" ]
           , button [ onClick (SetTopThreshold 17) ] [ text "17" ]
+          ]
+      , div []
+          [ span [] [text "Pohlaví"]
+          , button [ onClick (SetGender Male) ] [ text "Kluk" ]
+          , button [ onClick (SetGender Female) ] [ text "Holka" ]
+          , button [ onClick (SetGender NotImportant) ] [ text "Nezáleží" ]
           ]
       ]
 
@@ -164,6 +178,7 @@ initialModel =
     , viewableFamilies = initialFamilies
     , bottomThreshold = 1
     , topThreshold = 17
+    , selectedGender = NotImportant
     }
 
 
