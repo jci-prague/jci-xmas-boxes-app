@@ -25,7 +25,7 @@ type alias Family =
 
 type alias Model =
     { families : List Family
-    , viewvableFamilies : List Family
+    , viewableFamilies : List Family
     , bottomThreshold: Int
     , topThreshold: Int
     }
@@ -35,6 +35,26 @@ type Msg
     = SetBottomThreshold Int
     | SetTopThreshold Int
     | None
+
+
+update : Msg -> (Model -> Model)
+update msg model =
+    case msg of
+        SetBottomThreshold threshold ->
+            { model | bottomThreshold = threshold
+            , viewableFamilies = (updateViewableFamilies model)
+            }
+        SetTopThreshold threshold ->
+            { model | topThreshold = threshold
+            , viewableFamilies = (updateViewableFamilies model)
+            }
+        None ->
+            model
+
+
+updateViewableFamilies : Model -> List Family
+updateViewableFamilies model =
+    model.families
 
 
 view : Model -> Html Msg
@@ -98,7 +118,7 @@ viewFamilies model =
                         [ (viewFamily f) ]
                     )
                 )
-                model.viewvableFamilies
+                model.viewableFamilies
             )
         ]
 
@@ -127,29 +147,18 @@ classForGender child =
 initialModel : Model
 initialModel =
     { families = initialFamilies
-    , viewvableFamilies = initialFamilies
+    , viewableFamilies = initialFamilies
     , bottomThreshold = 1
     , topThreshold = 17
     }
 
 
 initialFamilies =
-        [ familyJimm
-        , familyEmaJohny
-        , familyMary
-        , familyJessie
-        ]
-
-
-update : Msg -> (Model -> Model)
-update msg model =
-    case msg of
-        SetBottomThreshold threshold ->
-            { model | bottomThreshold = threshold }
-        SetTopThreshold threshold ->
-            { model | topThreshold = threshold }
-        None ->
-            model
+    [ familyJimm
+    , familyEmaJohny
+    , familyMary
+    , familyJessie
+    ]
 
 
 main : Program Never Model Msg
