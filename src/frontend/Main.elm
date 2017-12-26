@@ -11,7 +11,9 @@ type Gender
     | Female
     | NotImportant
 
-type FamilyId = FamilyId Int
+
+type FamilyId
+    = FamilyId Int
 
 
 type alias Child =
@@ -42,6 +44,7 @@ type Msg
     | SetTopThreshold Int
     | SetGender Gender
     | AddFamilyToSelected Int
+    | SendReservation
     | None
 
 
@@ -65,27 +68,39 @@ update msg model =
                 | selectedGender = gender
                 , viewableFamilies = (updateViewableFamilies model.bottomThreshold model.topThreshold gender model.families)
             }
+
         AddFamilyToSelected familyId ->
             { model
-                | selectedFamilies = (addToSelectedFamilies model familyId)
+                | selectedFamilies = (addToSelectedFamilies model (FamilyId familyId))
             }
+
+        SendReservation ->
+            model
 
         None ->
             model
 
-addToSelectedFamilies : Model -> Int -> List Family
+
+addToSelectedFamilies : Model -> FamilyId -> List Family
 addToSelectedFamilies model familyId =
-    model.selectedGender :: (findFamilyById model.viewableFamilies familyId)
+    (findFamilyById model.viewableFamilies familyId) :: model.selectedFamilies
 
 
-findFamilyById : List Family -> Int -> Family
+findFamilyById : List Family -> FamilyId -> Family
 findFamilyById families familyId =
     let
-        family = List.filter (\f -> familyId == f.familyId) families
+        filteredFamilies =
+            List.filter (\f -> familyId == f.familyId) families
+
+        maybeFamily =
+            List.head filteredFamilies
     in
-        case family of
-            Just value -> value
-            Nothing -> { familyId = familyId, children = [] }
+        case maybeFamily of
+            Just value ->
+                value
+
+            Nothing ->
+                { familyId = familyId, children = [] }
 
 
 updateViewableFamilies : Int -> Int -> Gender -> List Family -> List Family
@@ -109,7 +124,19 @@ view : Model -> Html Msg
 view model =
     div []
         [ (filterFormView model)
+        , (reservationFormView model)
         , (viewFamilies model)
+        ]
+
+
+reservationFormView : Model -> Html Msg
+reservationFormView model =
+    div []
+        [ label [ for "name" ] [ text "Jméno" ]
+        , input [ type_ "text", name "name", placeholder "Jméno" ] []
+        , label [ for "email" ] [ text "Email" ]
+        , input [ type_ "text", name "email", placeholder "jirka@seznam.cz" ] []
+        , button [ onClick SendReservation ] [ text "Zaregistrovat se" ]
         ]
 
 
@@ -255,13 +282,15 @@ childJohny =
 
 familyEmaJohny : Family
 familyEmaJohny =
-    { children = [ childEma, childJohny ]
+    { familyId = (FamilyId 1001)
+    , children = [ childEma, childJohny ]
     }
 
 
 familyJimm : Family
 familyJimm =
-    { children =
+    { familyId = (FamilyId 1002)
+    , children =
         [ { name = "Jimm", age = 11, gender = Male }
         ]
     }
@@ -269,7 +298,8 @@ familyJimm =
 
 familyMary : Family
 familyMary =
-    { children =
+    { familyId = (FamilyId 1003)
+    , children =
         [ { name = "Mary", age = 8, gender = Female }
         ]
     }
@@ -277,7 +307,8 @@ familyMary =
 
 familyJessie : Family
 familyJessie =
-    { children =
+    { familyId = (FamilyId 1004)
+    , children =
         [ { name = "Jessie", age = 11, gender = Female }
         ]
     }
