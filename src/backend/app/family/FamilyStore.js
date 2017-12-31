@@ -44,7 +44,6 @@ function FamilyStore() {
     familyToUpdate.free = false
     familyToUpdate.contact = family.contact
     const fileContent = JSON.stringify(families)
-    console.log(__dirname)
     fs.writeFileSync(pathToFamilyData, fileContent)
 
     return true

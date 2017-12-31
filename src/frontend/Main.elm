@@ -43,7 +43,8 @@ type Msg
     = SetBottomThreshold Int
     | SetTopThreshold Int
     | SetGender Gender
-    | AddFamilyToSelected Int
+    | AddFamilyToSelected FamilyId
+    | RemoveFamilyFromSelected FamilyId
     | SendReservation
     | None
 
@@ -71,8 +72,12 @@ update msg model =
 
         AddFamilyToSelected familyId ->
             { model
-                | selectedFamilies = (addToSelectedFamilies model (FamilyId familyId))
+                | selectedFamilies = (addToSelectedFamilies model familyId)
+                , viewableFamilies = (removeSelectedFamilies model familyId)
             }
+
+        RemoveFamilyFromSelected familyId ->
+            model
 
         SendReservation ->
             model
@@ -84,6 +89,11 @@ update msg model =
 addToSelectedFamilies : Model -> FamilyId -> List Family
 addToSelectedFamilies model familyId =
     (findFamilyById model.viewableFamilies familyId) :: model.selectedFamilies
+
+
+removeSelectedFamilies : Model -> FamilyId -> List Family
+removeSelectedFamilies model familyId =
+    List.filter (\f -> familyId /= f.familyId) model.viewableFamilies
 
 
 findFamilyById : List Family -> FamilyId -> Family
@@ -124,6 +134,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ (filterFormView model)
+        , (viewSelectedFamilies model)
         , (reservationFormView model)
         , (viewFamilies model)
         ]
@@ -199,6 +210,21 @@ filterFormView model =
         ]
 
 
+viewSelectedFamilies : Model -> Html Msg
+viewSelectedFamilies model =
+    div []
+        [ ul []
+            (List.map
+                (\f ->
+                    (li []
+                        [ (viewSelectedFamily f) ]
+                    )
+                )
+                model.selectedFamilies
+            )
+        ]
+
+
 viewFamilies : Model -> Html Msg
 viewFamilies model =
     div []
@@ -214,6 +240,21 @@ viewFamilies model =
         ]
 
 
+viewSelectedFamily : Family -> Html Msg
+viewSelectedFamily family =
+    div []
+        (List.map
+            (\ch ->
+                div [ class (classForGender ch) ]
+                    [ span [ class "childName" ] [ (text ch.name) ]
+                    , span [ class "childAge" ] [ (text (toString ch.age)) ]
+                    , button [ onClick (RemoveFamilyFromSelected family.familyId) ] [ text "Odebrat" ]
+                    ]
+            )
+            family.children
+        )
+
+
 viewFamily : Family -> Html Msg
 viewFamily family =
     div []
@@ -222,6 +263,7 @@ viewFamily family =
                 div [ class (classForGender ch) ]
                     [ span [ class "childName" ] [ (text ch.name) ]
                     , span [ class "childAge" ] [ (text (toString ch.age)) ]
+                    , button [ onClick (AddFamilyToSelected family.familyId) ] [ text "Obdarovat" ]
                     ]
             )
             family.children
