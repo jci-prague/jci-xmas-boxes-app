@@ -1,5 +1,7 @@
 module Main exposing (..)
 
+import Browser exposing (sandbox)
+import Debug exposing (toString)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
@@ -297,10 +299,10 @@ initialFamilies =
     ]
 
 
-main : Program Never Model Msg
+main : Program () Model Msg
 main =
-    Html.beginnerProgram
-        { model = initialModel
+    Browser.sandbox
+        { init = initialModel
         , view = view
         , update = update
         }
