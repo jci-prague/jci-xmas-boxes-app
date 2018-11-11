@@ -1,4 +1,4 @@
-module Main exposing (..)
+module Main exposing (Model, addToSelectedFamilies, anyChildInAgeRangeAndGender, childEma, childJohny, classForGender, familyEmaJohny, familyJessie, familyJimm, familyMary, filterFormView, findFamilyById, initialFamilies, initialModel, main, removeSelectedFamilies, reservationFormView, update, updateViewableFamilies, view, viewFamilies, viewFamily, viewSelectedFamilies, viewSelectedFamily)
 
 import Browser exposing (sandbox)
 import Debug exposing (toString)
@@ -6,29 +6,8 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import List exposing (..)
-
-
-type Gender
-    = Male
-    | Female
-    | NotImportant
-
-
-type FamilyId
-    = FamilyId Int
-
-
-type alias Child =
-    { name : String
-    , age : Int
-    , gender : Gender
-    }
-
-
-type alias Family =
-    { familyId : FamilyId
-    , children : List Child
-    }
+import Requests exposing (..)
+import Types exposing (..)
 
 
 type alias Model =
@@ -41,41 +20,31 @@ type alias Model =
     }
 
 
-type Msg
-    = SetBottomThreshold Int
-    | SetTopThreshold Int
-    | SetGender Gender
-    | AddFamilyToSelected FamilyId
-    | RemoveFamilyFromSelected FamilyId
-    | SendReservation
-    | None
-
-
 update : Msg -> (Model -> Model)
 update msg model =
     case msg of
         SetBottomThreshold threshold ->
             { model
                 | bottomThreshold = threshold
-                , viewableFamilies = (updateViewableFamilies threshold model.topThreshold model.selectedGender model.families)
+                , viewableFamilies = updateViewableFamilies threshold model.topThreshold model.selectedGender model.families
             }
 
         SetTopThreshold threshold ->
             { model
                 | topThreshold = threshold
-                , viewableFamilies = (updateViewableFamilies model.bottomThreshold threshold model.selectedGender model.families)
+                , viewableFamilies = updateViewableFamilies model.bottomThreshold threshold model.selectedGender model.families
             }
 
         SetGender gender ->
             { model
                 | selectedGender = gender
-                , viewableFamilies = (updateViewableFamilies model.bottomThreshold model.topThreshold gender model.families)
+                , viewableFamilies = updateViewableFamilies model.bottomThreshold model.topThreshold gender model.families
             }
 
         AddFamilyToSelected familyId ->
             { model
-                | selectedFamilies = (addToSelectedFamilies model familyId)
-                , viewableFamilies = (removeSelectedFamilies model familyId)
+                | selectedFamilies = addToSelectedFamilies model familyId
+                , viewableFamilies = removeSelectedFamilies model familyId
             }
 
         RemoveFamilyFromSelected familyId ->
@@ -90,7 +59,7 @@ update msg model =
 
 addToSelectedFamilies : Model -> FamilyId -> List Family
 addToSelectedFamilies model familyId =
-    (findFamilyById model.viewableFamilies familyId) :: model.selectedFamilies
+    findFamilyById model.viewableFamilies familyId :: model.selectedFamilies
 
 
 removeSelectedFamilies : Model -> FamilyId -> List Family
@@ -107,18 +76,18 @@ findFamilyById families familyId =
         maybeFamily =
             List.head filteredFamilies
     in
-        case maybeFamily of
-            Just value ->
-                value
+    case maybeFamily of
+        Just value ->
+            value
 
-            Nothing ->
-                { familyId = familyId, children = [] }
+        Nothing ->
+            { familyId = familyId, children = [] }
 
 
 updateViewableFamilies : Int -> Int -> Gender -> List Family -> List Family
 updateViewableFamilies bottom top gender families =
     List.filter
-        (\f -> (anyChildInAgeRangeAndGender bottom top gender f))
+        (\f -> anyChildInAgeRangeAndGender bottom top gender f)
         families
 
 
@@ -135,10 +104,10 @@ anyChildInAgeRangeAndGender bottom top gender family =
 view : Model -> Html Msg
 view model =
     div []
-        [ (filterFormView model)
-        , (viewSelectedFamilies model)
-        , (reservationFormView model)
-        , (viewFamilies model)
+        [ filterFormView model
+        , viewSelectedFamilies model
+        , reservationFormView model
+        , viewFamilies model
         ]
 
 
@@ -159,10 +128,10 @@ filterFormView model =
         [ div []
             [ span [] [ text "Věk: " ]
             , span []
-                [ (text ((toString model.bottomThreshold) ++ " - " ++ (toString model.topThreshold)))
+                [ text (toString model.bottomThreshold ++ " - " ++ toString model.topThreshold)
                 ]
             , span []
-                [ text ("(" ++ (toString model.selectedGender) ++ ")")
+                [ text ("(" ++ toString model.selectedGender ++ ")")
                 ]
             ]
         , div []
@@ -218,9 +187,8 @@ viewSelectedFamilies model =
         [ ul []
             (List.map
                 (\f ->
-                    (li []
-                        [ (viewSelectedFamily f) ]
-                    )
+                    li []
+                        [ viewSelectedFamily f ]
                 )
                 model.selectedFamilies
             )
@@ -233,9 +201,8 @@ viewFamilies model =
         [ ul []
             (List.map
                 (\f ->
-                    (li []
-                        [ (viewFamily f) ]
-                    )
+                    li []
+                        [ viewFamily f ]
                 )
                 model.viewableFamilies
             )
@@ -248,8 +215,8 @@ viewSelectedFamily family =
         (List.map
             (\ch ->
                 div [ class (classForGender ch) ]
-                    [ span [ class "childName" ] [ (text ch.name) ]
-                    , span [ class "childAge" ] [ (text (toString ch.age)) ]
+                    [ span [ class "childName" ] [ text ch.name ]
+                    , span [ class "childAge" ] [ text (toString ch.age) ]
                     , button [ onClick (RemoveFamilyFromSelected family.familyId) ] [ text "Odebrat" ]
                     ]
             )
@@ -263,8 +230,8 @@ viewFamily family =
         (List.map
             (\ch ->
                 div [ class (classForGender ch) ]
-                    [ span [ class "childName" ] [ (text ch.name) ]
-                    , span [ class "childAge" ] [ (text (toString ch.age)) ]
+                    [ span [ class "childName" ] [ text ch.name ]
+                    , span [ class "childAge" ] [ text (toString ch.age) ]
                     , button [ onClick (AddFamilyToSelected family.familyId) ] [ text "Obdarovat" ]
                     ]
             )
@@ -276,6 +243,7 @@ classForGender : Child -> String
 classForGender child =
     if child.gender == Male then
         "male"
+
     else
         "female"
 
@@ -326,14 +294,14 @@ childJohny =
 
 familyEmaJohny : Family
 familyEmaJohny =
-    { familyId = (FamilyId 1001)
+    { familyId = FamilyId "F1001"
     , children = [ childEma, childJohny ]
     }
 
 
 familyJimm : Family
 familyJimm =
-    { familyId = (FamilyId 1002)
+    { familyId = FamilyId "F1002"
     , children =
         [ { name = "Jimm", age = 11, gender = Male }
         ]
@@ -342,7 +310,7 @@ familyJimm =
 
 familyMary : Family
 familyMary =
-    { familyId = (FamilyId 1003)
+    { familyId = FamilyId "F1003"
     , children =
         [ { name = "Mary", age = 8, gender = Female }
         ]
@@ -351,7 +319,7 @@ familyMary =
 
 familyJessie : Family
 familyJessie =
-    { familyId = (FamilyId 1004)
+    { familyId = FamilyId "F1004"
     , children =
         [ { name = "Jessie", age = 11, gender = Female }
         ]
