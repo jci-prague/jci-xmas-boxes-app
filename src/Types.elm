@@ -28,6 +28,10 @@ type alias Family =
     }
 
 
+type alias FamilyList =
+    List Family
+
+
 type Msg
     = SetBottomThreshold Int
     | SetTopThreshold Int
@@ -35,4 +39,5 @@ type Msg
     | AddFamilyToSelected FamilyId
     | RemoveFamilyFromSelected FamilyId
     | SendReservation
+    | FetchFamilyResponse FamilyList
     | None

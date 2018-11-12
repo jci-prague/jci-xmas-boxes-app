@@ -20,41 +20,62 @@ type alias Model =
     }
 
 
-update : Msg -> (Model -> Model)
+update : Msg -> Model -> ( Model, Cmd msg )
 update msg model =
     case msg of
         SetBottomThreshold threshold ->
-            { model
+            ( { model
                 | bottomThreshold = threshold
                 , viewableFamilies = updateViewableFamilies threshold model.topThreshold model.selectedGender model.families
-            }
+              }
+            , Cmd.none
+            )
 
         SetTopThreshold threshold ->
-            { model
+            ( { model
                 | topThreshold = threshold
                 , viewableFamilies = updateViewableFamilies model.bottomThreshold threshold model.selectedGender model.families
-            }
+              }
+            , Cmd.none
+            )
 
         SetGender gender ->
-            { model
+            ( { model
                 | selectedGender = gender
                 , viewableFamilies = updateViewableFamilies model.bottomThreshold model.topThreshold gender model.families
-            }
+              }
+            , Cmd.none
+            )
 
         AddFamilyToSelected familyId ->
-            { model
+            ( { model
                 | selectedFamilies = addToSelectedFamilies model familyId
                 , viewableFamilies = removeSelectedFamilies model familyId
-            }
+              }
+            , Cmd.none
+            )
 
         RemoveFamilyFromSelected familyId ->
-            model
+            ( model
+            , Cmd.none
+            )
+
+        FetchFamilyResponse familyList ->
+            ( { model
+                | families = familyList
+              }
+            , Cmd.none
+            )
 
         SendReservation ->
-            model
+            ( model
+            , Cmd.none
+            )
 
         None ->
-            model
+            ( model
+            , Cmd.none
+            )
 
 
 addToSelectedFamilies : Model -> FamilyId -> List Family
@@ -248,15 +269,17 @@ classForGender child =
         "female"
 
 
-initialModel : Model
-initialModel =
-    { families = initialFamilies
-    , viewableFamilies = initialFamilies
-    , bottomThreshold = 1
-    , topThreshold = 17
-    , selectedGender = NotImportant
-    , selectedFamilies = []
-    }
+initialModel : Maybe String -> ( Model, Cmd msg )
+initialModel aString =
+    ( { families = initialFamilies
+      , viewableFamilies = initialFamilies
+      , bottomThreshold = 1
+      , topThreshold = 17
+      , selectedGender = NotImportant
+      , selectedFamilies = []
+      }
+    , Cmd.none
+    )
 
 
 initialFamilies =
@@ -267,13 +290,19 @@ initialFamilies =
     ]
 
 
-main : Program () Model Msg
+main : Program (Maybe String) Model Msg
 main =
-    Browser.sandbox
+    Browser.element
         { init = initialModel
         , view = view
         , update = update
+        , subscriptions = initSubscriptions
         }
+
+
+initSubscriptions : model -> Sub msg
+initSubscriptions model =
+    Sub.none
 
 
 childEma : Child
