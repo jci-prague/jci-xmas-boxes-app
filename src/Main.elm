@@ -1,22 +1,23 @@
-module Main exposing (Model, addToSelectedFamilies, anyChildInAgeRangeAndGender, childEma, childJohny, classForGender, familyEmaJohny, familyJessie, familyJimm, familyMary, filterFormView, findFamilyById, initialFamilies, initialModel, main, removeSelectedFamilies, reservationFormView, update, updateViewableFamilies, view, viewFamilies, viewFamily, viewSelectedFamilies, viewSelectedFamily)
+module Main exposing (main)
 
 import Browser exposing (sandbox)
 import Debug exposing (toString)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
+import Http exposing (get, send)
 import List exposing (..)
 import Requests exposing (..)
 import Types exposing (..)
 
 
 type alias Model =
-    { families : List Family
-    , viewableFamilies : List Family
+    { families : FamilyList
+    , viewableFamilies : FamilyList
     , bottomThreshold : Int
     , topThreshold : Int
     , selectedGender : Gender
-    , selectedFamilies : List Family
+    , selectedFamilies : FamilyList
     }
 
 
@@ -60,10 +61,16 @@ update msg model =
             , Cmd.none
             )
 
-        FetchFamilyResponse familyList ->
+        FetchFamilyResponse (Ok families) ->
             ( { model
-                | families = familyList
+                | families = families.families
+                , viewableFamilies = families.families
               }
+            , Cmd.none
+            )
+
+        FetchFamilyResponse (Err _) ->
+            ( model
             , Cmd.none
             )
 
@@ -269,28 +276,20 @@ classForGender child =
         "female"
 
 
-initialModel : Maybe String -> ( Model, Cmd msg )
+initialModel : () -> ( Model, Cmd Msg )
 initialModel aString =
-    ( { families = initialFamilies
-      , viewableFamilies = initialFamilies
+    ( { families = []
+      , viewableFamilies = []
       , bottomThreshold = 1
       , topThreshold = 17
       , selectedGender = NotImportant
       , selectedFamilies = []
       }
-    , Cmd.none
+    , fetchFamilyList
     )
 
 
-initialFamilies =
-    [ familyJimm
-    , familyEmaJohny
-    , familyMary
-    , familyJessie
-    ]
-
-
-main : Program (Maybe String) Model Msg
+main : Program () Model Msg
 main =
     Browser.element
         { init = initialModel
@@ -305,51 +304,11 @@ initSubscriptions model =
     Sub.none
 
 
-childEma : Child
-childEma =
-    { name = "Ema"
-    , age = 3
-    , gender = Female
-    }
+fetchFamilyList : Cmd Msg
+fetchFamilyList =
+    Http.send FetchFamilyResponse getFamilyList
 
 
-childJohny : Child
-childJohny =
-    { name = "Johny"
-    , age = 5
-    , gender = Male
-    }
-
-
-familyEmaJohny : Family
-familyEmaJohny =
-    { familyId = FamilyId "F1001"
-    , children = [ childEma, childJohny ]
-    }
-
-
-familyJimm : Family
-familyJimm =
-    { familyId = FamilyId "F1002"
-    , children =
-        [ { name = "Jimm", age = 11, gender = Male }
-        ]
-    }
-
-
-familyMary : Family
-familyMary =
-    { familyId = FamilyId "F1003"
-    , children =
-        [ { name = "Mary", age = 8, gender = Female }
-        ]
-    }
-
-
-familyJessie : Family
-familyJessie =
-    { familyId = FamilyId "F1004"
-    , children =
-        [ { name = "Jessie", age = 11, gender = Female }
-        ]
-    }
+getFamilyList : Http.Request Families
+getFamilyList =
+    Http.get "/api/family" familiesDecoder

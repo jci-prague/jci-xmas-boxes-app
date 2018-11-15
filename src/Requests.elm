@@ -1,4 +1,4 @@
-module Requests exposing (childDecoder, genderDecoder)
+module Requests exposing (familiesDecoder)
 
 import Json.Decode as Decode exposing (Decoder, float, int, list, string)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
@@ -49,3 +49,14 @@ familyDecoder =
     Decode.succeed Family
         |> required "id" familyIdDecoder
         |> required "children" childListDecoder
+
+
+familyListDecoder : Decoder FamilyList
+familyListDecoder =
+    Decode.list familyDecoder
+
+
+familiesDecoder : Decoder Families
+familiesDecoder =
+    Decode.succeed Families
+        |> required "families" familyListDecoder

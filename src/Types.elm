@@ -1,4 +1,6 @@
-module Types exposing (Child, ChildList, Family, FamilyId(..), Gender(..), Msg(..))
+module Types exposing (Child, ChildList, Families, Family, FamilyId(..), FamilyList, Gender(..), Msg(..))
+
+import Http exposing (Error)
 
 
 type Gender
@@ -32,6 +34,11 @@ type alias FamilyList =
     List Family
 
 
+type alias Families =
+    { families : FamilyList
+    }
+
+
 type Msg
     = SetBottomThreshold Int
     | SetTopThreshold Int
@@ -39,5 +46,5 @@ type Msg
     | AddFamilyToSelected FamilyId
     | RemoveFamilyFromSelected FamilyId
     | SendReservation
-    | FetchFamilyResponse FamilyList
+    | FetchFamilyResponse (Result Http.Error Families)
     | None
