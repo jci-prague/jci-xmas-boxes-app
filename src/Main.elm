@@ -51,13 +51,16 @@ update msg model =
         AddFamilyToSelected familyId ->
             ( { model
                 | selectedFamilies = addToSelectedFamilies model familyId
-                , viewableFamilies = removeSelectedFamilies model familyId
+                , viewableFamilies = removeFromViewableFamilies model familyId
               }
             , Cmd.none
             )
 
         RemoveFamilyFromSelected familyId ->
-            ( model
+            ( { model
+                | selectedFamilies = removeFromSelectedFamilies model familyId
+                , viewableFamilies = addToViewableFamilies model familyId
+              }
             , Cmd.none
             )
 
@@ -90,8 +93,18 @@ addToSelectedFamilies model familyId =
     findFamilyById model.viewableFamilies familyId :: model.selectedFamilies
 
 
-removeSelectedFamilies : Model -> FamilyId -> List Family
-removeSelectedFamilies model familyId =
+addToViewableFamilies : Model -> FamilyId -> List Family
+addToViewableFamilies model familyId =
+    findFamilyById model.selectedFamilies familyId :: model.viewableFamilies
+
+
+removeFromSelectedFamilies : Model -> FamilyId -> List Family
+removeFromSelectedFamilies model familyId =
+    List.filter (\f -> familyId /= f.familyId) model.selectedFamilies
+
+
+removeFromViewableFamilies : Model -> FamilyId -> List Family
+removeFromViewableFamilies model familyId =
     List.filter (\f -> familyId /= f.familyId) model.viewableFamilies
 
 
