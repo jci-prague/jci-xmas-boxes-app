@@ -47,4 +47,6 @@ type Msg
     | RemoveFamilyFromSelected FamilyId
     | SendReservation
     | FetchFamilyResponse (Result Http.Error Families)
+    | UpdateName String
+    | UpdateEmail String
     | None

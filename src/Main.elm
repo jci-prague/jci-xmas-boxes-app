@@ -18,6 +18,8 @@ type alias Model =
     , topThreshold : Int
     , selectedGender : Gender
     , selectedFamilies : FamilyList
+    , donnorName : Maybe String
+    , donnorEmail : Maybe String
     }
 
 
@@ -74,6 +76,16 @@ update msg model =
 
         FetchFamilyResponse (Err _) ->
             ( model
+            , Cmd.none
+            )
+
+        UpdateName name ->
+            ( { model | donnorName = Just name }
+            , Cmd.none
+            )
+
+        UpdateEmail email ->
+            ( { model | donnorEmail = Just email }
             , Cmd.none
             )
 
@@ -156,9 +168,9 @@ reservationFormView : Model -> Html Msg
 reservationFormView model =
     div []
         [ label [ for "name" ] [ text "Jméno" ]
-        , input [ type_ "text", name "name", placeholder "Jméno" ] []
+        , input [ type_ "text", name "name", placeholder "Jméno", onInput UpdateName ] []
         , label [ for "email" ] [ text "Email" ]
-        , input [ type_ "text", name "email", placeholder "jirka@seznam.cz" ] []
+        , input [ type_ "text", name "email", placeholder "jirka@seznam.cz", onInput UpdateEmail ] []
         , button [ onClick SendReservation ] [ text "Zaregistrovat se" ]
         ]
 
@@ -297,6 +309,8 @@ initialModel aString =
       , topThreshold = 17
       , selectedGender = NotImportant
       , selectedFamilies = []
+      , donnorName = Maybe.Nothing
+      , donnorEmail = Maybe.Nothing
       }
     , fetchFamilyList
     )
