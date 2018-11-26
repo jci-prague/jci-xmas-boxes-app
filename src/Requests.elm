@@ -1,8 +1,17 @@
-module Requests exposing (familiesDecoder)
+module Requests exposing (donorEncoder, familiesDecoder)
 
 import Json.Decode as Decode exposing (Decoder, float, int, list, string)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
+import Json.Encode as Encode exposing (Value)
 import Types exposing (..)
+
+
+donorEncoder : String -> String -> Value
+donorEncoder name email =
+    Encode.object
+        [ ( "name", Encode.string name )
+        , ( "email", Encode.string email )
+        ]
 
 
 genderDecoder : Decoder Gender

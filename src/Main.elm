@@ -6,6 +6,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Http exposing (get, send)
+import Json.Decode as Decode exposing (string)
 import List exposing (..)
 import Requests exposing (..)
 import Types exposing (..)
@@ -18,12 +19,12 @@ type alias Model =
     , topThreshold : Int
     , selectedGender : Gender
     , selectedFamilies : FamilyList
-    , donnorName : Maybe String
-    , donnorEmail : Maybe String
+    , donorName : Maybe String
+    , donorEmail : Maybe String
     }
 
 
-update : Msg -> Model -> ( Model, Cmd msg )
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SetBottomThreshold threshold ->
@@ -80,16 +81,29 @@ update msg model =
             )
 
         UpdateName name ->
-            ( { model | donnorName = Just name }
+            ( { model | donorName = Just name }
             , Cmd.none
             )
 
         UpdateEmail email ->
-            ( { model | donnorEmail = Just email }
+            ( { model | donorEmail = Just email }
             , Cmd.none
             )
 
         SendReservation ->
+            ( model
+            , postDonor model
+            )
+
+        PostDonorResponse (Ok resultString) ->
+            ( { model
+                | donorName = Maybe.Nothing
+                , donorEmail = Maybe.Nothing
+              }
+            , Cmd.none
+            )
+
+        PostDonorResponse (Err _) ->
             ( model
             , Cmd.none
             )
@@ -309,8 +323,8 @@ initialModel aString =
       , topThreshold = 17
       , selectedGender = NotImportant
       , selectedFamilies = []
-      , donnorName = Maybe.Nothing
-      , donnorEmail = Maybe.Nothing
+      , donorName = Maybe.Nothing
+      , donorEmail = Maybe.Nothing
       }
     , fetchFamilyList
     )
@@ -339,3 +353,30 @@ fetchFamilyList =
 getFamilyList : Http.Request Families
 getFamilyList =
     Http.get "/api/family" familiesDecoder
+
+
+postDonor : Model -> Cmd Msg
+postDonor model =
+    let
+        name =
+            case model.donorName of
+                Just na ->
+                    na
+
+                Nothing ->
+                    ""
+
+        email =
+            case model.donorEmail of
+                Just em ->
+                    em
+
+                Nothing ->
+                    ""
+    in
+    if name /= "" && email /= "" then
+        Http.post "/api/donor" (Http.jsonBody (Requests.donorEncoder name email)) string
+            |> Http.send PostDonorResponse
+
+    else
+        Cmd.none

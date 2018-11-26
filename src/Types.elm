@@ -49,4 +49,5 @@ type Msg
     | FetchFamilyResponse (Result Http.Error Families)
     | UpdateName String
     | UpdateEmail String
+    | PostDonorResponse (Result Http.Error String)
     | None
