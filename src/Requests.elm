@@ -1,10 +1,20 @@
-module Requests exposing (donorEncoder, familiesDecoder)
+module Requests exposing (giftEncoder, familiesDecoder)
 
 import Json.Decode as Decode exposing (Decoder, float, int, list, string)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 import Json.Encode as Encode exposing (Value)
 import Types exposing (..)
 
+giftEncoder : FamilyList -> String -> String -> Value
+giftEncoder families name email =
+    let
+        familyIds : List FamilyId
+        familyIds = List.map (\f -> f.familyId) families
+    in
+        Encode.object
+            [ ( "donor", (donorEncoder name email))
+            , ( "familyIds", (familyIdListEncoder familyIds))
+            ]
 
 donorEncoder : String -> String -> Value
 donorEncoder name email =
@@ -13,6 +23,13 @@ donorEncoder name email =
         , ( "email", Encode.string email )
         ]
 
+familyIdEncoder : FamilyId -> Value
+familyIdEncoder (FamilyId id) =
+    Encode.string id
+
+familyIdListEncoder : List FamilyId -> Value
+familyIdListEncoder familyIds =
+    Encode.list familyIdEncoder familyIds
 
 genderDecoder : Decoder Gender
 genderDecoder =

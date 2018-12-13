@@ -373,9 +373,10 @@ postDonor model =
 
                 Nothing ->
                     ""
+        families = model.selectedFamilies
     in
     if name /= "" && email /= "" then
-        Http.post "/api/donor" (Http.jsonBody (Requests.donorEncoder name email)) string
+        Http.post "/api/family/gift" (Http.jsonBody (Requests.giftEncoder families name email)) string
             |> Http.send PostDonorResponse
 
     else
