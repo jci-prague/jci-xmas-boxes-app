@@ -1,4 +1,14 @@
-module Types exposing (Child, ChildList, Families, Family, FamilyId(..), FamilyList, Gender(..), Msg(..))
+module Types exposing
+    ( Child
+    , ChildList
+    , Families
+    , Family
+    , FamilyId(..)
+    , FamilyList
+    , Gender(..)
+    , genderToString
+    , Msg(..)
+    )
 
 import Http exposing (Error)
 
@@ -7,6 +17,13 @@ type Gender
     = Male
     | Female
     | NotImportant
+
+genderToString : Gender -> String
+genderToString gender =
+    case gender of
+        Male -> "Male"
+        Female -> "Female"
+        NotImportant -> "Not Important"
 
 
 type FamilyId

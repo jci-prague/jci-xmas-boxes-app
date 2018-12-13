@@ -1,7 +1,6 @@
 module Main exposing (main)
 
 import Browser exposing (sandbox)
-import Debug exposing (toString)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
@@ -195,10 +194,10 @@ filterFormView model =
         [ div []
             [ span [] [ text "Věk: " ]
             , span []
-                [ text (toString model.bottomThreshold ++ " - " ++ toString model.topThreshold)
+                [ text (String.fromInt model.bottomThreshold ++ " - " ++ String.fromInt model.topThreshold)
                 ]
             , span []
-                [ text ("(" ++ toString model.selectedGender ++ ")")
+                [ text ("(" ++ (genderToString model.selectedGender) ++ ")")
                 ]
             ]
         , div []
@@ -280,10 +279,10 @@ viewSelectedFamily : Family -> Html Msg
 viewSelectedFamily family =
     div []
         (List.map
-            (\ch ->
-                div [ class (classForGender ch) ]
-                    [ span [ class "childName" ] [ text ch.name ]
-                    , span [ class "childAge" ] [ text (toString ch.age) ]
+            (\child ->
+                div [ class (classForGender child) ]
+                    [ span [ class "childName" ] [ text child.name ]
+                    , span [ class "childAge" ] [ text (String.fromInt child.age) ]
                     , button [ onClick (RemoveFamilyFromSelected family.familyId) ] [ text "Odebrat" ]
                     ]
             )
@@ -295,10 +294,10 @@ viewFamily : Family -> Html Msg
 viewFamily family =
     div []
         (List.map
-            (\ch ->
-                div [ class (classForGender ch) ]
-                    [ span [ class "childName" ] [ text ch.name ]
-                    , span [ class "childAge" ] [ text (toString ch.age) ]
+            (\child ->
+                div [ class (classForGender child) ]
+                    [ span [ class "childName" ] [ text child.name ]
+                    , span [ class "childAge" ] [ text (String.fromInt child.age) ]
                     , button [ onClick (AddFamilyToSelected family.familyId) ] [ text "Obdarovat" ]
                     ]
             )
