@@ -171,9 +171,8 @@ view : Model -> Html Msg
 view model =
     div []
         [ filterFormView model
-        , viewSelectedFamilies model
-        , reservationFormView model
         , viewFamilies model
+        , reservationFormView model
         ]
 
 
@@ -188,6 +187,10 @@ reservationFormView model =
             , div [ class "row form-group" ]
                 [ label [ class "col", for "email" ] [ text "Email" ]
                 , input [ class "col-9 input-control", type_ "text", name "email", placeholder "jirka@seznam.cz", onInput UpdateEmail ] []
+                ]
+            , div [ class "row" ]
+                [ span [ class "col" ] [ text "" ]
+                , div [ class "col-9" ] [ viewSelectedFamilies model ]
                 ]
             , div [ class "row form-group" ]
                 [ span [ class "col" ] [ text "" ]
@@ -258,12 +261,11 @@ filterFormView model =
 
 viewSelectedFamilies : Model -> Html Msg
 viewSelectedFamilies model =
-    div []
-        [ ul []
+    div [ class "row" ]
+        [ div [ class "col" ]
             (List.map
                 (\f ->
-                    li []
-                        [ viewSelectedFamily f ]
+                    viewSelectedFamily f
                 )
                 model.selectedFamilies
             )
@@ -289,10 +291,10 @@ viewSelectedFamily family =
     div []
         (List.map
             (\child ->
-                div [ class (classForGender child) ]
-                    [ span [ class "childName" ] [ text child.name ]
-                    , span [ class "childAge" ] [ text (String.fromInt child.age) ]
-                    , button [ onClick (RemoveFamilyFromSelected family.familyId) ] [ text "Odebrat" ]
+                div [ class "row margin-bottom-1em" ]
+                    [ span [ class "col" ] [ text child.name ]
+                    , span [ class "col" ] [ text (String.fromInt child.age) ]
+                    , button [ class "col btn btn-danger", onClick (RemoveFamilyFromSelected family.familyId) ] [ text "Odebrat" ]
                     ]
             )
             family.children
