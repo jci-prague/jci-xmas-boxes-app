@@ -179,12 +179,21 @@ view model =
 
 reservationFormView : Model -> Html Msg
 reservationFormView model =
-    div []
-        [ label [ for "name" ] [ text "Jméno" ]
-        , input [ type_ "text", name "name", placeholder "Jméno", onInput UpdateName ] []
-        , label [ for "email" ] [ text "Email" ]
-        , input [ type_ "text", name "email", placeholder "jirka@seznam.cz", onInput UpdateEmail ] []
-        , button [ onClick SendReservation ] [ text "Zaregistrovat se" ]
+    div [ class "row" ]
+        [ div [ class "col-sm" ]
+            [ div [ class "row form-group" ]
+                [ label [ class "col", for "name" ] [ text "Jméno" ]
+                , input [ class "col-9 input-control", type_ "text", name "name", placeholder "Jméno", onInput UpdateName ] []
+                ]
+            , div [ class "row form-group" ]
+                [ label [ class "col", for "email" ] [ text "Email" ]
+                , input [ class "col-9 input-control", type_ "text", name "email", placeholder "jirka@seznam.cz", onInput UpdateEmail ] []
+                ]
+            , div [ class "row form-group" ]
+                [ span [ class "col" ] [ text "" ]
+                , button [ class "col-9 btn btn-primary", onClick SendReservation ] [ text "Zaregistrovat se" ]
+                ]
+            ]
         ]
 
 
@@ -197,7 +206,7 @@ filterFormView model =
                 [ text (String.fromInt model.bottomThreshold ++ " - " ++ String.fromInt model.topThreshold)
                 ]
             , span []
-                [ text ("(" ++ (genderToString model.selectedGender) ++ ")")
+                [ text ("(" ++ genderToString model.selectedGender ++ ")")
                 ]
             ]
         , div []
@@ -372,7 +381,9 @@ postDonor model =
 
                 Nothing ->
                     ""
-        families = model.selectedFamilies
+
+        families =
+            model.selectedFamilies
     in
     if name /= "" && email /= "" then
         Http.post "/api/family/gift" (Http.jsonBody (Requests.giftEncoder families name email)) string
