@@ -7,7 +7,7 @@
     "watch": "./node_modules/.bin/npm-watch"
   },
   "watch": {
-    "build": "src/*.elm"
+    "build": "src/*.*"
   },
   "repository": {
     "type": "git",
