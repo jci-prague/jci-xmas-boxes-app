@@ -274,12 +274,12 @@ viewSelectedFamilies model =
 
 viewFamilies : Model -> Html Msg
 viewFamilies model =
-    div []
-        [ ul []
+    div [ class "row" ]
+        [ div [ class "col" ] [ text "" ]
+        , div [ class "col-9 margin-bottom-1em" ]
             (List.map
                 (\f ->
-                    li []
-                        [ viewFamily f ]
+                    viewFamily f
                 )
                 model.viewableFamilies
             )
@@ -288,7 +288,7 @@ viewFamilies model =
 
 viewSelectedFamily : Family -> Html Msg
 viewSelectedFamily family =
-    div []
+    div [ class "border-bottom-1px" ]
         (List.map
             (\child ->
                 div [ class "row margin-bottom-1em" ]
@@ -303,17 +303,43 @@ viewSelectedFamily family =
 
 viewFamily : Family -> Html Msg
 viewFamily family =
-    div []
-        (List.map
-            (\child ->
-                div [ class (classForGender child) ]
-                    [ span [ class "childName" ] [ text child.name ]
-                    , span [ class "childAge" ] [ text (String.fromInt child.age) ]
-                    , button [ onClick (AddFamilyToSelected family.familyId) ] [ text "Obdarovat" ]
-                    ]
-            )
-            family.children
-        )
+    let
+        firstChild : Child
+        firstChild =
+            case List.head family.children of
+                Just child ->
+                    child
+
+                Nothing ->
+                    Child "" 0 NotImportant
+
+        otherChildren : ChildList
+        otherChildren =
+            case List.tail family.children of
+                Just children ->
+                    children
+
+                Nothing ->
+                    []
+
+        childRows =
+            [ div [ class "row margin-top-1-5em" ]
+                [ span [ class "col" ] [ text firstChild.name ]
+                , span [ class "col" ] [ text (String.fromInt firstChild.age) ]
+                , button [ class "col btn btn-primary", onClick (AddFamilyToSelected family.familyId) ] [ text "Obdarovat" ]
+                ]
+            ]
+                ++ List.map
+                    (\child ->
+                        div [ class "row" ]
+                            [ span [ class "col" ] [ text child.name ]
+                            , span [ class "col" ] [ text (String.fromInt child.age) ]
+                            , span [ class "col" ] [ text "" ]
+                            ]
+                    )
+                    otherChildren
+    in
+    div [] childRows
 
 
 classForGender : Child -> String
