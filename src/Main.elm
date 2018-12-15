@@ -203,16 +203,7 @@ reservationFormView model =
 filterFormView : Model -> Html Msg
 filterFormView model =
     div []
-        [ div []
-            [ span [] [ text "Věk: " ]
-            , span []
-                [ text (String.fromInt model.bottomThreshold ++ " - " ++ String.fromInt model.topThreshold)
-                ]
-            , span []
-                [ text ("(" ++ genderToString model.selectedGender ++ ")")
-                ]
-            ]
-        , div [ class "row form-group" ]
+        [ div [ class "row form-group" ]
             [ span [ class "col" ] [ text "Od" ]
             , button [ class ("col btn " ++ isButtonEqualTreshold model.bottomThreshold 1), onClick (SetBottomThreshold 1) ] [ text "1" ]
             , button [ class ("col btn " ++ isButtonEqualTreshold model.bottomThreshold 2), onClick (SetBottomThreshold 2) ] [ text "2" ]
@@ -231,7 +222,7 @@ filterFormView model =
             , button [ class ("col btn " ++ isButtonEqualTreshold model.bottomThreshold 15), onClick (SetBottomThreshold 15) ] [ text "15" ]
             , button [ class ("col btn " ++ isButtonEqualTreshold model.bottomThreshold 16), onClick (SetBottomThreshold 16) ] [ text "16" ]
             ]
-        , div [ class "row" ]
+        , div [ class "row form-group" ]
             [ span [ class "col" ] [ text "Do" ]
             , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 2), onClick (SetTopThreshold 2) ] [ text "2" ]
             , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 3), onClick (SetTopThreshold 3) ] [ text "3" ]
@@ -250,11 +241,11 @@ filterFormView model =
             , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 16), onClick (SetTopThreshold 16) ] [ text "16" ]
             , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 17), onClick (SetTopThreshold 17) ] [ text "17" ]
             ]
-        , div []
-            [ span [] [ text "Pohlaví" ]
-            , button [ onClick (SetGender Male) ] [ text "Kluk" ]
-            , button [ onClick (SetGender Female) ] [ text "Holka" ]
-            , button [ onClick (SetGender NotImportant) ] [ text "Nezáleží" ]
+        , div [ class "row form-group" ]
+            [ span [ class "col" ] [ text "Pohlaví" ]
+            , button [ class ("col btn " ++ isGenderEqualSelected model.selectedGender Male), onClick (SetGender Male) ] [ text "Kluk" ]
+            , button [ class ("col btn " ++ isGenderEqualSelected model.selectedGender Female), onClick (SetGender Female) ] [ text "Holka" ]
+            , button [ class ("col btn " ++ isGenderEqualSelected model.selectedGender NotImportant), onClick (SetGender NotImportant) ] [ text "Nezáleží" ]
             ]
         ]
 
@@ -262,6 +253,15 @@ filterFormView model =
 isButtonEqualTreshold : Int -> Int -> String
 isButtonEqualTreshold currentTreshold buttonTreshold =
     if currentTreshold == buttonTreshold then
+        "btn-primary"
+
+    else
+        "btn-outline-primary"
+
+
+isGenderEqualSelected : Gender -> Gender -> String
+isGenderEqualSelected selectedGender buttonGender =
+    if selectedGender == buttonGender then
         "btn-primary"
 
     else
