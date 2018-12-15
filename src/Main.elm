@@ -261,7 +261,7 @@ filterFormView model =
 
 viewSelectedFamilies : Model -> Html Msg
 viewSelectedFamilies model =
-    div [ class "row" ]
+    div [ class "row margin-bottom-1em" ]
         [ div [ class "col" ]
             (List.map
                 (\f ->
@@ -288,17 +288,43 @@ viewFamilies model =
 
 viewSelectedFamily : Family -> Html Msg
 viewSelectedFamily family =
-    div [ class "border-bottom-1px" ]
-        (List.map
-            (\child ->
-                div [ class "row margin-bottom-1em" ]
-                    [ span [ class "col" ] [ text child.name ]
-                    , span [ class "col" ] [ text (String.fromInt child.age) ]
-                    , button [ class "col btn btn-danger", onClick (RemoveFamilyFromSelected family.familyId) ] [ text "Odebrat" ]
-                    ]
-            )
-            family.children
-        )
+    let
+        firstChild : Child
+        firstChild =
+            case List.head family.children of
+                Just child ->
+                    child
+
+                Nothing ->
+                    Child "" 0 NotImportant
+
+        otherChildren : ChildList
+        otherChildren =
+            case List.tail family.children of
+                Just children ->
+                    children
+
+                Nothing ->
+                    []
+
+        childRows =
+            [ div [ class "row margin-top-1-5em" ]
+                [ span [ class "col" ] [ text firstChild.name ]
+                , span [ class "col" ] [ text (String.fromInt firstChild.age) ]
+                , button [ class "col btn btn-danger", onClick (RemoveFamilyFromSelected family.familyId) ] [ text "Odebrat" ]
+                ]
+            ]
+                ++ List.map
+                    (\child ->
+                        div [ class "row" ]
+                            [ span [ class "col" ] [ text child.name ]
+                            , span [ class "col" ] [ text (String.fromInt child.age) ]
+                            , span [ class "col" ] [ text "" ]
+                            ]
+                    )
+                    otherChildren
+    in
+    div [] childRows
 
 
 viewFamily : Family -> Html Msg
