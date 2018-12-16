@@ -189,7 +189,7 @@ reservationFormView model =
                 , input [ class "col-9 input-control", type_ "text", name "email", placeholder "jirka@seznam.cz", onInput UpdateEmail ] []
                 ]
             , div [ class "row" ]
-                [ span [ class "col" ] [ text "" ]
+                [ span [ class "col" ] [ text "Vybrané děti" ]
                 , div [ class "col-9" ] [ viewSelectedFamilies model ]
                 ]
             , div [ class "row form-group" ]
@@ -270,28 +270,48 @@ isGenderEqualSelected selectedGender buttonGender =
 
 viewSelectedFamilies : Model -> Html Msg
 viewSelectedFamilies model =
-    div [ class "row margin-bottom-1em" ]
-        [ div [ class "col" ]
-            (List.map
-                (\f ->
-                    viewSelectedFamily f
+    if List.length model.selectedFamilies > 0 then
+        div [ class "row margin-bottom-1em" ]
+            [ div [ class "col" ]
+                (List.map
+                    (\f ->
+                        viewSelectedFamily f
+                    )
+                    model.selectedFamilies
                 )
-                model.selectedFamilies
-            )
-        ]
+            ]
+
+    else
+        div [ class "row margin-bottom-1em" ]
+            [ div [ class "col alert alert-primary" ]
+                [ text "Nemáte vybrané ještě žádné děti k obdarování."
+                ]
+            ]
 
 
 viewFamilies : Model -> Html Msg
 viewFamilies model =
+    let
+        familyContent =
+            if List.length model.families > 0 then
+                if List.length model.viewableFamilies > 0 then
+                    div [ class "col-9 margin-bottom-1em" ]
+                        (List.map
+                            (\f ->
+                                viewFamily f
+                            )
+                            model.viewableFamilies
+                        )
+
+                else
+                    div [ class "col-9 alert alert-primary" ] [ text "Zvolenému filtru již neodpovídá žádné dítě, zkuste upravit věk nebo pohlaví." ]
+
+            else
+                div [ class "col-9 alert alert-primary" ] [ text "Bohužel, momentálně nejsou k dispozici žádné děti k obdarování." ]
+    in
     div [ class "row" ]
-        [ div [ class "col" ] [ text "" ]
-        , div [ class "col-9 margin-bottom-1em" ]
-            (List.map
-                (\f ->
-                    viewFamily f
-                )
-                model.viewableFamilies
-            )
+        [ div [ class "col" ] [ text "Děti či sourozenci" ]
+        , familyContent
         ]
 
 
