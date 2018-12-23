@@ -86,4 +86,6 @@ type alias Model =
     , selectedFamilies : FamilyList
     , donorName : Maybe String
     , donorEmail : Maybe String
+    , successMessage: Maybe String
+    , errorMessage: Maybe String
     }

@@ -84,6 +84,7 @@ update msg model =
         FetchFamilyResponse (Ok families) ->
             ( { model
                 | families = families.families
+                , selectedFamilies = []
                 , viewableFamilies = families.families
               }
             , Cmd.none
@@ -105,21 +106,37 @@ update msg model =
             )
 
         SendReservation ->
-            ( model
+            ( { model
+              | errorMessage = Nothing
+              , successMessage = Nothing
+              }
             , postDonor model
             )
 
         PostDonorResponse (Ok resultString) ->
             ( { model
-                | donorName = Maybe.Nothing
-                , donorEmail = Maybe.Nothing
+                | donorEmail = Maybe.Nothing
+                , donorName = Maybe.Nothing
+                , selectedFamilies = []
+                , successMessage = Just "Vaše rezervace byla úspěšně zpracována. Na zadaný email Vám přijde potvrzovací email."
               }
             , Cmd.none
             )
 
-        PostDonorResponse (Err _) ->
-            ( model
-            , Cmd.none
+        PostDonorResponse (Err error) ->
+            let
+                errorString : String
+                errorString = case error of
+                    Http.BadUrl url -> ("Bad URL: " ++ url)
+                    Http.Timeout -> "Timeout"
+                    Http.NetworkError -> "Network Error"
+                    Http.BadStatus response -> ("Bad Status: " ++ (String.fromInt response.status.code) ++ "(" ++ response.status.message ++ ")")
+                    Http.BadPayload message response -> ("Bad Payload: " ++ message)
+            in
+            ( { model
+              | errorMessage = Just ("Je nám líto, ale během zpracování Vaší rezervace nastala chyba. Zkuste to, prosím, ještě jednou. (" ++ errorString ++ ")")
+              }
+            , fetchFamilyList
             )
 
         None ->
@@ -204,6 +221,8 @@ initialModel aString =
       , selectedFamilies = []
       , donorName = Maybe.Nothing
       , donorEmail = Maybe.Nothing
+      , successMessage = Maybe.Nothing
+      , errorMessage = Maybe.Nothing
       }
     , fetchFamilyList
     )

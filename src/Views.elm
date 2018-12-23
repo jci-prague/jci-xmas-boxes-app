@@ -106,8 +106,26 @@ reservationFormView model =
                 [ span [ class "col" ] [ text "" ]
                 , button [ class "col-9 btn btn-primary", onClick SendReservation ] [ text "Zaregistrovat se" ]
                 ]
+            , div [ class "row" ] 
+                [ div [ class "col" ] []
+                , viewMessagePane model
+                ]
             ]
         ]
+
+viewMessagePane : Model -> Html Msg
+viewMessagePane model =
+    case model.errorMessage of
+        Just errMessage ->
+            div [ class "col-9 alert alert-danger" ] [ text errMessage ]
+        Nothing ->
+            case model.successMessage of
+                Just succMessage ->
+                    div [ class "alert alert-success" ] [ text succMessage ]
+                Nothing ->
+                    div [] []
+
+                
 
 
 isButtonEqualTreshold : Int -> Int -> String
