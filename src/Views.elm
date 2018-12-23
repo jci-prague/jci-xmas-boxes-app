@@ -1,13 +1,14 @@
 module Views exposing
-     ( filterFormView
-     , viewFamilies
-     , reservationFormView
-     )
+    ( filterFormView
+    , reservationFormView
+    , viewFamilies
+    )
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Types exposing (..)
+
 
 filterFormView : Model -> Html Msg
 filterFormView model =
@@ -58,6 +59,7 @@ filterFormView model =
             ]
         ]
 
+
 viewFamilies : Model -> Html Msg
 viewFamilies model =
     let
@@ -82,6 +84,7 @@ viewFamilies model =
         [ div [ class "col" ] [ text "Děti či sourozenci" ]
         , familyContent
         ]
+
 
 reservationFormView : Model -> Html Msg
 reservationFormView model =
@@ -144,8 +147,6 @@ viewSelectedFamilies model =
                 [ text "Nemáte vybrané ještě žádné děti k obdarování."
                 ]
             ]
-
-
 
 
 viewSelectedFamily : Family -> Html Msg

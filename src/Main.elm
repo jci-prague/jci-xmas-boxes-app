@@ -40,11 +40,16 @@ update msg model =
         AddFamilyToSelected familyId ->
             let
                 selectedFamilies : FamilyList
-                selectedFamilies = addToSelectedFamilies model familyId
+                selectedFamilies =
+                    addToSelectedFamilies model familyId
+
                 families : FamilyList
-                families = removeFromFamilies model familyId
+                families =
+                    removeFromFamilies model familyId
+
                 viewableFamilies : FamilyList
-                viewableFamilies = filterViewableFamilies model.bottomThreshold model.topThreshold model.selectedGender families selectedFamilies
+                viewableFamilies =
+                    filterViewableFamilies model.bottomThreshold model.topThreshold model.selectedGender families selectedFamilies
             in
             ( { model
                 | selectedFamilies = selectedFamilies
@@ -57,11 +62,16 @@ update msg model =
         RemoveFamilyFromSelected familyId ->
             let
                 selectedFamilies : FamilyList
-                selectedFamilies = removeFromSelectedFamilies model familyId
+                selectedFamilies =
+                    removeFromSelectedFamilies model familyId
+
                 families : FamilyList
-                families = addToFamilies model familyId
+                families =
+                    addToFamilies model familyId
+
                 viewableFamilies : FamilyList
-                viewableFamilies = filterViewableFamilies model.bottomThreshold model.topThreshold model.selectedGender families selectedFamilies
+                viewableFamilies =
+                    filterViewableFamilies model.bottomThreshold model.topThreshold model.selectedGender families selectedFamilies
             in
             ( { model
                 | selectedFamilies = selectedFamilies
@@ -142,9 +152,8 @@ filterViewableFamilies : Int -> Int -> Gender -> FamilyList -> FamilyList -> Fam
 filterViewableFamilies bottom top gender families selectedFamilies =
     List.filter
         (\f ->
-            (anyChildInAgeRangeAndGender bottom top gender f) 
-            &&
-            not (List.any (\sf -> sf.familyId == f.familyId) selectedFamilies)
+            anyChildInAgeRangeAndGender bottom top gender f
+                && not (List.any (\sf -> sf.familyId == f.familyId) selectedFamilies)
         )
         families
 

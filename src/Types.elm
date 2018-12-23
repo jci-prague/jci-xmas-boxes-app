@@ -6,9 +6,9 @@ module Types exposing
     , FamilyId(..)
     , FamilyList
     , Gender(..)
-    , genderToString
     , Model
     , Msg(..)
+    , genderToString
     )
 
 import Http exposing (Error)
@@ -19,12 +19,18 @@ type Gender
     | Female
     | NotImportant
 
+
 genderToString : Gender -> String
 genderToString gender =
     case gender of
-        Male -> "Male"
-        Female -> "Female"
-        NotImportant -> "Not Important"
+        Male ->
+            "Male"
+
+        Female ->
+            "Female"
+
+        NotImportant ->
+            "Not Important"
 
 
 type FamilyId
@@ -69,6 +75,7 @@ type Msg
     | UpdateEmail String
     | PostDonorResponse (Result Http.Error String)
     | None
+
 
 type alias Model =
     { families : FamilyList
