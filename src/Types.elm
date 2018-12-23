@@ -7,6 +7,7 @@ module Types exposing
     , FamilyList
     , Gender(..)
     , genderToString
+    , Model
     , Msg(..)
     )
 
@@ -68,3 +69,14 @@ type Msg
     | UpdateEmail String
     | PostDonorResponse (Result Http.Error String)
     | None
+
+type alias Model =
+    { families : FamilyList
+    , viewableFamilies : FamilyList
+    , bottomThreshold : Int
+    , topThreshold : Int
+    , selectedGender : Gender
+    , selectedFamilies : FamilyList
+    , donorName : Maybe String
+    , donorEmail : Maybe String
+    }
