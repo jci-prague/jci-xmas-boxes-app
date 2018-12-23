@@ -16,7 +16,7 @@ update msg model =
         SetBottomThreshold threshold ->
             ( { model
                 | bottomThreshold = threshold
-                , viewableFamilies = updateViewableFamilies threshold model.topThreshold model.selectedGender model.families
+                , viewableFamilies = filterViewableFamilies threshold model.topThreshold model.selectedGender model.families model.selectedFamilies
               }
             , Cmd.none
             )
@@ -24,7 +24,7 @@ update msg model =
         SetTopThreshold threshold ->
             ( { model
                 | topThreshold = threshold
-                , viewableFamilies = updateViewableFamilies model.bottomThreshold threshold model.selectedGender model.families
+                , viewableFamilies = filterViewableFamilies model.bottomThreshold threshold model.selectedGender model.families model.selectedFamilies
               }
             , Cmd.none
             )
@@ -32,23 +32,41 @@ update msg model =
         SetGender gender ->
             ( { model
                 | selectedGender = gender
-                , viewableFamilies = updateViewableFamilies model.bottomThreshold model.topThreshold gender model.families
+                , viewableFamilies = filterViewableFamilies model.bottomThreshold model.topThreshold gender model.families model.selectedFamilies
               }
             , Cmd.none
             )
 
         AddFamilyToSelected familyId ->
+            let
+                selectedFamilies : FamilyList
+                selectedFamilies = addToSelectedFamilies model familyId
+                families : FamilyList
+                families = removeFromFamilies model familyId
+                viewableFamilies : FamilyList
+                viewableFamilies = filterViewableFamilies model.bottomThreshold model.topThreshold model.selectedGender families selectedFamilies
+            in
             ( { model
-                | selectedFamilies = addToSelectedFamilies model familyId
-                , viewableFamilies = removeFromViewableFamilies model familyId
+                | selectedFamilies = selectedFamilies
+                , families = families
+                , viewableFamilies = viewableFamilies
               }
             , Cmd.none
             )
 
         RemoveFamilyFromSelected familyId ->
+            let
+                selectedFamilies : FamilyList
+                selectedFamilies = removeFromSelectedFamilies model familyId
+                families : FamilyList
+                families = addToFamilies model familyId
+                viewableFamilies : FamilyList
+                viewableFamilies = filterViewableFamilies model.bottomThreshold model.topThreshold model.selectedGender families selectedFamilies
+            in
             ( { model
-                | selectedFamilies = removeFromSelectedFamilies model familyId
-                , viewableFamilies = addToViewableFamilies model familyId
+                | selectedFamilies = selectedFamilies
+                , families = families
+                , viewableFamilies = viewableFamilies
               }
             , Cmd.none
             )
@@ -100,27 +118,38 @@ update msg model =
             )
 
 
-addToSelectedFamilies : Model -> FamilyId -> List Family
+addToSelectedFamilies : Model -> FamilyId -> FamilyList
 addToSelectedFamilies model familyId =
-    findFamilyById model.viewableFamilies familyId :: model.selectedFamilies
+    findFamilyById model.families familyId :: model.selectedFamilies
 
 
-addToViewableFamilies : Model -> FamilyId -> List Family
-addToViewableFamilies model familyId =
-    findFamilyById model.selectedFamilies familyId :: model.viewableFamilies
-
-
-removeFromSelectedFamilies : Model -> FamilyId -> List Family
+removeFromSelectedFamilies : Model -> FamilyId -> FamilyList
 removeFromSelectedFamilies model familyId =
     List.filter (\f -> familyId /= f.familyId) model.selectedFamilies
 
 
-removeFromViewableFamilies : Model -> FamilyId -> List Family
-removeFromViewableFamilies model familyId =
-    List.filter (\f -> familyId /= f.familyId) model.viewableFamilies
+addToFamilies : Model -> FamilyId -> FamilyList
+addToFamilies model familyId =
+    findFamilyById model.selectedFamilies familyId :: model.families
 
 
-findFamilyById : List Family -> FamilyId -> Family
+removeFromFamilies : Model -> FamilyId -> FamilyList
+removeFromFamilies model familyId =
+    List.filter (\f -> familyId /= f.familyId) model.families
+
+
+filterViewableFamilies : Int -> Int -> Gender -> FamilyList -> FamilyList -> FamilyList
+filterViewableFamilies bottom top gender families selectedFamilies =
+    List.filter
+        (\f ->
+            (anyChildInAgeRangeAndGender bottom top gender f) 
+            &&
+            not (List.any (\sf -> sf.familyId == f.familyId) selectedFamilies)
+        )
+        families
+
+
+findFamilyById : FamilyList -> FamilyId -> Family
 findFamilyById families familyId =
     let
         filteredFamilies =
@@ -135,13 +164,6 @@ findFamilyById families familyId =
 
         Nothing ->
             { familyId = familyId, children = [] }
-
-
-updateViewableFamilies : Int -> Int -> Gender -> List Family -> List Family
-updateViewableFamilies bottom top gender families =
-    List.filter
-        (\f -> anyChildInAgeRangeAndGender bottom top gender f)
-        families
 
 
 anyChildInAgeRangeAndGender : Int -> Int -> Gender -> Family -> Bool
