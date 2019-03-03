@@ -19,6 +19,6 @@
     "url": "https://github.com/jci-prague/jci-xmas-boxes-app/issues"
   },
   "devDependencies": {
-    "npm-watch": "^0.5.0"
+    "npm-watch": "^0.6.0"
   }
 }
