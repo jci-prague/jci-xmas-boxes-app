@@ -8,6 +8,8 @@ module Types exposing
     , Gender(..)
     , Model
     , Msg(..)
+    , PostGiftApiResultType
+    , PostGiftApiType
     , genderToString
     )
 
@@ -63,6 +65,19 @@ type alias Families =
     }
 
 
+type alias PostGiftApiResultType =
+    { familyId : FamilyId
+    , success : Bool
+    , errors : List String
+    }
+
+
+type alias PostGiftApiType =
+    { success : Bool
+    , results : List PostGiftApiResultType
+    }
+
+
 type Msg
     = SetBottomThreshold Int
     | SetTopThreshold Int
@@ -73,7 +88,7 @@ type Msg
     | FetchFamilyResponse (Result Http.Error Families)
     | UpdateName String
     | UpdateEmail String
-    | PostDonorResponse (Result Http.Error String)
+    | PostDonorResponse (Result Http.Error PostGiftApiType)
     | None
 
 

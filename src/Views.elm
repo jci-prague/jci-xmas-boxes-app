@@ -107,7 +107,7 @@ reservationFormView model =
                 , button [ class "col-9 btn btn-primary", onClick SendReservation ] [ text "Zaregistrovat se" ]
                 ]
             , div [ class "row" ] 
-                [ div [ class "col" ] []
+                [ div [ class "col-3" ] []
                 , viewMessagePane model
                 ]
             ]
@@ -121,7 +121,7 @@ viewMessagePane model =
         Nothing ->
             case model.successMessage of
                 Just succMessage ->
-                    div [ class "alert alert-success" ] [ text succMessage ]
+                    div [ class "col-9 alert alert-success" ] [ text succMessage ]
                 Nothing ->
                     div [] []
 

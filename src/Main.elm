@@ -118,7 +118,7 @@ update msg model =
                 | donorEmail = Maybe.Nothing
                 , donorName = Maybe.Nothing
                 , selectedFamilies = []
-                , successMessage = Just "Vaše rezervace byla úspěšně zpracována. Na zadaný email Vám přijde potvrzovací email."
+                , successMessage = Just "Vaše rezervace byla úspěšně zpracována. Na zadanou emailovou adresu Vám přijde potvrzovací email."
               }
             , Cmd.none
             )
@@ -276,7 +276,7 @@ postDonor model =
             model.selectedFamilies
     in
     if name /= "" && email /= "" then
-        Http.post "/api/family/gift" (Http.jsonBody (Requests.giftEncoder families name email)) string
+        Http.post "/api/family/gift" (Http.jsonBody (Requests.giftEncoder families name email)) postGiftApiTypeDecoder
             |> Http.send PostDonorResponse
 
     else
