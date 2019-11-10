@@ -4,10 +4,35 @@ module Views exposing
     , viewFamilies
     )
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html
+    exposing
+        ( Html
+        , button
+        , div
+        , input
+        , label
+        , span
+        , text
+        )
+import Html.Attributes
+    exposing
+        ( class
+        , for
+        , name
+        , placeholder
+        , type_
+        )
 import Html.Events exposing (onClick, onInput)
-import Types exposing (..)
+import Types
+    exposing
+        ( Child
+        , ChildList
+        , Family
+        , FamilyId(..)
+        , Gender(..)
+        , Model
+        , Msg(..)
+        )
 
 
 filterFormView : Model -> Html Msg
@@ -106,26 +131,27 @@ reservationFormView model =
                 [ span [ class "col" ] [ text "" ]
                 , button [ class "col-9 btn btn-primary", onClick SendReservation ] [ text "Zaregistrovat se" ]
                 ]
-            , div [ class "row" ] 
+            , div [ class "row" ]
                 [ div [ class "col-3" ] []
                 , viewMessagePane model
                 ]
             ]
         ]
 
+
 viewMessagePane : Model -> Html Msg
 viewMessagePane model =
     case model.errorMessage of
         Just errMessage ->
             div [ class "col-9 alert alert-danger" ] [ text errMessage ]
+
         Nothing ->
             case model.successMessage of
                 Just succMessage ->
                     div [ class "col-9 alert alert-success" ] [ text succMessage ]
+
                 Nothing ->
                     div [] []
-
-                
 
 
 isButtonEqualTreshold : Int -> Int -> String
@@ -189,13 +215,12 @@ viewSelectedFamily family =
                     []
 
         childRows =
-            [ div [ class "row margin-top-1-5em" ]
+            div [ class "row margin-top-1-5em" ]
                 [ span [ class "col" ] [ text firstChild.name ]
                 , span [ class "col" ] [ text (String.fromInt firstChild.age) ]
                 , button [ class "col btn btn-danger", onClick (RemoveFamilyFromSelected family.familyId) ] [ text "Odebrat" ]
                 ]
-            ]
-                ++ List.map
+                :: List.map
                     (\child ->
                         div [ class "row" ]
                             [ span [ class "col" ] [ text child.name ]
@@ -230,13 +255,12 @@ viewFamily family =
                     []
 
         childRows =
-            [ div [ class "row margin-top-1-5em" ]
+            div [ class "row margin-top-1-5em" ]
                 [ span [ class "col" ] [ text firstChild.name ]
                 , span [ class "col" ] [ text (String.fromInt firstChild.age) ]
                 , button [ class "col btn btn-primary", onClick (AddFamilyToSelected family.familyId) ] [ text "Obdarovat" ]
                 ]
-            ]
-                ++ List.map
+                :: List.map
                     (\child ->
                         div [ class "row" ]
                             [ span [ class "col" ] [ text child.name ]
@@ -247,12 +271,3 @@ viewFamily family =
                     otherChildren
     in
     div [] childRows
-
-
-classForGender : Child -> String
-classForGender child =
-    if child.gender == Male then
-        "male"
-
-    else
-        "female"
