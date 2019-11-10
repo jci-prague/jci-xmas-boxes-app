@@ -89,6 +89,7 @@ type Msg
     | UpdateName String
     | UpdateEmail String
     | PostDonorResponse (Result Http.Error PostGiftApiType)
+    | ToggleAgreement
     | None
 
 
@@ -103,4 +104,5 @@ type alias Model =
     , donorEmail : Maybe String
     , successMessage : Maybe String
     , errorMessage : Maybe String
+    , agreement : Bool
     }

@@ -166,6 +166,11 @@ update msg model =
             , fetchFamilyList
             )
 
+        ToggleAgreement ->
+            ( { model | agreement = not model.agreement }
+            , Cmd.none
+            )
+
         None ->
             ( model
             , Cmd.none
@@ -250,6 +255,7 @@ initialModel _ =
       , donorEmail = Maybe.Nothing
       , successMessage = Maybe.Nothing
       , errorMessage = Maybe.Nothing
+      , agreement = False
       }
     , fetchFamilyList
     )

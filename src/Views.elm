@@ -7,6 +7,7 @@ module Views exposing
 import Html
     exposing
         ( Html
+        , a
         , button
         , div
         , input
@@ -17,7 +18,9 @@ import Html
 import Html.Attributes
     exposing
         ( class
+        , disabled
         , for
+        , href
         , name
         , placeholder
         , type_
@@ -129,7 +132,18 @@ reservationFormView model =
                 ]
             , div [ class "row form-group" ]
                 [ span [ class "col" ] [ text "" ]
-                , button [ class "col-9 btn btn-primary", onClick SendReservation ] [ text "Zaregistrovat se" ]
+                , label [ class "col-9 form-check-label" ]
+                    [ input [ type_ "checkbox", onClick ToggleAgreement ] []
+                    , span []
+                        [ text "  Souhlasím se "
+                        , a [ href "/gdpr/" ] [ text "zpracováním poskytnutách osobních údajů" ]
+                        , text "."
+                        ]
+                    ]
+                ]
+            , div [ class "row form-group" ]
+                [ span [ class "col" ] [ text "" ]
+                , button [ class "col-9 btn btn-primary", onClick SendReservation, disabled (not model.agreement) ] [ text "Zaregistrovat se" ]
                 ]
             , div [ class "row" ]
                 [ div [ class "col-3" ] []
