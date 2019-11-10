@@ -1,13 +1,30 @@
 module Main exposing (main)
 
-import Browser exposing (sandbox)
+import Browser as Browser exposing (element)
 import Html exposing (Html, div)
 import Http exposing (get, send)
-import Json.Decode as Decode exposing (string)
-import List exposing (..)
-import Requests exposing (..)
-import Types exposing (..)
-import Views exposing (..)
+import List as List
+import Requests
+    exposing
+        ( familiesDecoder
+        , postGiftApiTypeDecoder
+        )
+import Types
+    exposing
+        ( Families
+        , Family
+        , FamilyId
+        , FamilyList
+        , Gender(..)
+        , Model
+        , Msg(..)
+        )
+import Views
+    exposing
+        ( filterFormView
+        , reservationFormView
+        , viewFamilies
+        )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -107,13 +124,13 @@ update msg model =
 
         SendReservation ->
             ( { model
-              | errorMessage = Nothing
-              , successMessage = Nothing
+                | errorMessage = Nothing
+                , successMessage = Nothing
               }
             , postDonor model
             )
 
-        PostDonorResponse (Ok resultString) ->
+        PostDonorResponse (Ok _) ->
             ( { model
                 | donorEmail = Maybe.Nothing
                 , donorName = Maybe.Nothing
@@ -126,15 +143,25 @@ update msg model =
         PostDonorResponse (Err error) ->
             let
                 errorString : String
-                errorString = case error of
-                    Http.BadUrl url -> ("Bad URL: " ++ url)
-                    Http.Timeout -> "Timeout"
-                    Http.NetworkError -> "Network Error"
-                    Http.BadStatus response -> ("Bad Status: " ++ (String.fromInt response.status.code) ++ "(" ++ response.status.message ++ ")")
-                    Http.BadPayload message response -> ("Bad Payload: " ++ message)
+                errorString =
+                    case error of
+                        Http.BadUrl url ->
+                            "Bad URL: " ++ url
+
+                        Http.Timeout ->
+                            "Timeout"
+
+                        Http.NetworkError ->
+                            "Network Error"
+
+                        Http.BadStatus response ->
+                            "Bad Status: " ++ String.fromInt response.status.code ++ "(" ++ response.status.message ++ ")"
+
+                        Http.BadPayload message _ ->
+                            "Bad Payload: " ++ message
             in
             ( { model
-              | errorMessage = Just ("Je nám líto, ale během zpracování Vaší rezervace nastala chyba. Zkuste to, prosím, ještě jednou. (" ++ errorString ++ ")")
+                | errorMessage = Just ("Je nám líto, ale během zpracování Vaší rezervace nastala chyba. Zkuste to, prosím, ještě jednou. (" ++ errorString ++ ")")
               }
             , fetchFamilyList
             )
@@ -212,7 +239,7 @@ view model =
 
 
 initialModel : () -> ( Model, Cmd Msg )
-initialModel aString =
+initialModel _ =
     ( { families = []
       , viewableFamilies = []
       , bottomThreshold = 1

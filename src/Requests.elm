@@ -4,10 +4,22 @@ module Requests exposing
     , postGiftApiTypeDecoder
     )
 
-import Json.Decode as Decode exposing (Decoder, bool, float, int, list, string)
-import Json.Decode.Pipeline exposing (hardcoded, optional, required)
+import Json.Decode as Decode exposing (Decoder, bool, int, list, string)
+import Json.Decode.Pipeline exposing (required)
 import Json.Encode as Encode exposing (Value)
-import Types exposing (..)
+import Types
+    exposing
+        ( Child
+        , ChildList
+        , Families
+        , Family
+        , FamilyId(..)
+        , FamilyList
+        , Gender(..)
+        , Msg(..)
+        , PostGiftApiResultType
+        , PostGiftApiType
+        )
 
 
 giftEncoder : FamilyList -> String -> String -> Value
@@ -101,14 +113,13 @@ familiesDecoder =
 postGiftApiResultTypeDecoder : Decoder PostGiftApiResultType
 postGiftApiResultTypeDecoder =
     Decode.succeed PostGiftApiResultType
-      |> required "familyId" familyIdDecoder
-      |> required "success" bool
-      |> required "errors" (Decode.list string)
+        |> required "familyId" familyIdDecoder
+        |> required "success" bool
+        |> required "errors" (Decode.list string)
 
 
 postGiftApiTypeDecoder : Decoder PostGiftApiType
 postGiftApiTypeDecoder =
     Decode.succeed PostGiftApiType
-      |> required "success" bool
-      |> required "results" (Decode.list postGiftApiResultTypeDecoder)
-
+        |> required "success" bool
+        |> required "results" (Decode.list postGiftApiResultTypeDecoder)

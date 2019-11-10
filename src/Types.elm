@@ -13,7 +13,7 @@ module Types exposing
     , genderToString
     )
 
-import Http exposing (Error)
+import Http as Http
 
 
 type Gender
@@ -101,6 +101,6 @@ type alias Model =
     , selectedFamilies : FamilyList
     , donorName : Maybe String
     , donorEmail : Maybe String
-    , successMessage: Maybe String
-    , errorMessage: Maybe String
+    , successMessage : Maybe String
+    , errorMessage : Maybe String
     }
