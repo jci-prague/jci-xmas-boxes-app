@@ -217,7 +217,7 @@ viewSelectedFamily family =
                     child
 
                 Nothing ->
-                    Child "" 0 NotImportant
+                    Child "" 0 NotImportant ""
 
         otherChildren : ChildList
         otherChildren =
@@ -230,16 +230,18 @@ viewSelectedFamily family =
 
         childRows =
             div [ class "row margin-top-1-5em" ]
-                [ span [ class "col" ] [ text firstChild.name ]
-                , span [ class "col" ] [ text (String.fromInt firstChild.age) ]
-                , button [ class "col btn btn-danger", onClick (RemoveFamilyFromSelected family.familyId) ] [ text "Odebrat" ]
+                [ span [ class "col-sm-2" ] [ text firstChild.name ]
+                , span [ class "col-sm-1" ] [ text (String.fromInt firstChild.age) ]
+                , span [ class "col-sm-7" ] [ text firstChild.specifics ]
+                , button [ class "col-sm-2 btn btn-danger", onClick (RemoveFamilyFromSelected family.familyId) ] [ text "Odebrat" ]
                 ]
                 :: List.map
                     (\child ->
                         div [ class "row" ]
-                            [ span [ class "col" ] [ text child.name ]
-                            , span [ class "col" ] [ text (String.fromInt child.age) ]
-                            , span [ class "col" ] [ text "" ]
+                            [ span [ class "col-sm-2" ] [ text child.name ]
+                            , span [ class "col-sm-1" ] [ text (String.fromInt child.age) ]
+                            , span [ class "col-sm-7" ] [ text child.specifics ]
+                            , span [ class "col-sm-2" ] [ text "" ]
                             ]
                     )
                     otherChildren
@@ -257,7 +259,7 @@ viewFamily family =
                     child
 
                 Nothing ->
-                    Child "" 0 NotImportant
+                    Child "" 0 NotImportant ""
 
         otherChildren : ChildList
         otherChildren =
@@ -269,17 +271,19 @@ viewFamily family =
                     []
 
         childRows =
-            div [ class "row margin-top-1-5em" ]
-                [ span [ class "col" ] [ text firstChild.name ]
-                , span [ class "col" ] [ text (String.fromInt firstChild.age) ]
-                , button [ class "col btn btn-primary", onClick (AddFamilyToSelected family.familyId) ] [ text "Obdarovat" ]
+            div [ class "row margin-top-1-5em family-background" ]
+                [ span [ class "col-sm-2" ] [ text firstChild.name ]
+                , span [ class "col-sm-1" ] [ text (String.fromInt firstChild.age) ]
+                , span [ class "col-sm-7" ] [ text firstChild.specifics ]
+                , button [ class "col-sm-2 btn btn-primary", onClick (AddFamilyToSelected family.familyId) ] [ text "Obdarovat" ]
                 ]
                 :: List.map
                     (\child ->
-                        div [ class "row" ]
-                            [ span [ class "col" ] [ text child.name ]
-                            , span [ class "col" ] [ text (String.fromInt child.age) ]
-                            , span [ class "col" ] [ text "" ]
+                        div [ class "row family-background" ]
+                            [ span [ class "col-sm-2" ] [ text child.name ]
+                            , span [ class "col-sm-1" ] [ text (String.fromInt child.age) ]
+                            , span [ class "col-sm-7" ] [ text child.specifics ]
+                            , span [ class "col-sm-2" ] [ text "" ]
                             ]
                     )
                     otherChildren

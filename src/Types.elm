@@ -43,6 +43,7 @@ type alias Child =
     { name : String
     , age : Int
     , gender : Gender
+    , specifics : String
     }
 
 

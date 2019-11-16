@@ -76,6 +76,7 @@ childDecoder =
         |> required "name" string
         |> required "age" int
         |> required "gender" genderDecoder
+        |> required "specifics" string
 
 
 childListDecoder : Decoder ChildList
