@@ -23,6 +23,7 @@ import Html.Attributes
         , href
         , name
         , placeholder
+        , target
         , type_
         )
 import Html.Events exposing (onClick, onInput)
@@ -42,7 +43,7 @@ filterFormView : Model -> Html Msg
 filterFormView model =
     div []
         [ div [ class "row form-group" ]
-            [ span [ class "col" ] [ text "Od" ]
+            [ span [ class "col" ] [ text "Věk od" ]
             , button [ class ("col btn " ++ isButtonEqualTreshold model.bottomThreshold 1), onClick (SetBottomThreshold 1) ] [ text "1" ]
             , button [ class ("col btn " ++ isButtonEqualTreshold model.bottomThreshold 2), onClick (SetBottomThreshold 2) ] [ text "2" ]
             , button [ class ("col btn " ++ isButtonEqualTreshold model.bottomThreshold 3), onClick (SetBottomThreshold 3) ] [ text "3" ]
@@ -61,7 +62,7 @@ filterFormView model =
             , button [ class ("col btn " ++ isButtonEqualTreshold model.bottomThreshold 16), onClick (SetBottomThreshold 16) ] [ text "16" ]
             ]
         , div [ class "row form-group" ]
-            [ span [ class "col" ] [ text "Do" ]
+            [ span [ class "col" ] [ text "Věk do" ]
             , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 2), onClick (SetTopThreshold 2) ] [ text "2" ]
             , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 3), onClick (SetTopThreshold 3) ] [ text "3" ]
             , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 4), onClick (SetTopThreshold 4) ] [ text "4" ]
@@ -85,6 +86,9 @@ filterFormView model =
             , button [ class ("col btn " ++ isGenderEqualSelected model.selectedGender Female), onClick (SetGender Female) ] [ text "Holka" ]
             , button [ class ("col btn " ++ isGenderEqualSelected model.selectedGender NotImportant), onClick (SetGender NotImportant) ] [ text "Nezáleží" ]
             ]
+        , div [ class "row" ]
+            [ div [ class "col" ] [ text "Můžeš obdarovat jedno dítě, sourozence (skupina dětí se společným tlačítkem 'Obdarovat') nebo i více dětí najednou. Tvoje vybrané děti se objevují ve formuláři pod seznamem. Po kliknutí na tlačítko OBDAROVAT, odskroluj až úplně dolů a dokonči registraci vyplněním formuláře. Po úspěšné registraci Ti bude obratem zaslán e-mail se všemi informacemi." ]
+            ]
         ]
 
 
@@ -95,11 +99,17 @@ viewFamilies model =
             if List.length model.families > 0 then
                 if List.length model.viewableFamilies > 0 then
                     div [ class "col-9 margin-bottom-1em" ]
-                        (List.map
-                            (\f ->
-                                viewFamily f
-                            )
-                            model.viewableFamilies
+                        (div [ class "row margin-top-1-5em family-list-header" ]
+                            [ span [ class "col-sm-2" ] [ text "Jméno" ]
+                            , span [ class "col-sm-1" ] [ text "Věk" ]
+                            , span [ class "col-sm-7" ] [ text "Koníčky/záliby" ]
+                            , span [ class "col-sm-2" ] [ text "" ]
+                            ]
+                            :: List.map
+                                (\f ->
+                                    viewFamily f
+                                )
+                                model.viewableFamilies
                         )
 
                 else
@@ -108,7 +118,7 @@ viewFamilies model =
             else
                 div [ class "col-9 alert alert-primary" ] [ text "Bohužel, momentálně nejsou k dispozici žádné děti k obdarování." ]
     in
-    div [ class "row" ]
+    div [ class "row margin-top-1-5em" ]
         [ div [ class "col" ] [ text "Děti či sourozenci" ]
         , familyContent
         ]
@@ -136,7 +146,7 @@ reservationFormView model =
                     [ input [ type_ "checkbox", onClick ToggleAgreement ] []
                     , span []
                         [ text "  Souhlasím se "
-                        , a [ href "/gdpr/" ] [ text "zpracováním poskytnutách osobních údajů" ]
+                        , a [ href "/gdpr/", target "_blank" ] [ text "zpracováním poskytnutách osobních údajů" ]
                         , text "."
                         ]
                     ]
