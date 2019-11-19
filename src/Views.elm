@@ -87,7 +87,7 @@ filterFormView model =
             , button [ class ("col btn " ++ isGenderEqualSelected model.selectedGender NotImportant), onClick (SetGender NotImportant) ] [ text "Nezáleží" ]
             ]
         , div [ class "row" ]
-            [ div [ class "col" ] [ text "Můžeš obdarovat jedno dítě, sourozence (skupina dětí se společným tlačítkem 'Obdarovat') nebo i více dětí najednou. Tvoje vybrané děti se objevují ve formuláři pod seznamem. Po kliknutí na tlačítko OBDAROVAT, odskroluj až úplně dolů a dokonči registraci vyplněním formuláře. Po úspěšné registraci Ti bude obratem zaslán e-mail se všemi informacemi." ]
+            [ div [ class "col" ] [ text "Můžeš obdarovat jedno dítě, sourozence (skupina dětí se společným tlačítkem 'Vybrat') nebo i více dětí najednou. Tvoje vybrané děti se objevují ve formuláři pod seznamem. Po kliknutí na tlačítko VYBRAT, odskroluj až úplně dolů a dokonči proces vyplněním formuláře a klinutím na tlačítko OBDAROVAT. Po úspěšné odeslání Ti bude obratem zaslán e-mail se všemi informacemi." ]
             ]
         ]
 
@@ -153,7 +153,7 @@ reservationFormView model =
                 ]
             , div [ class "row form-group" ]
                 [ span [ class "col" ] [ text "" ]
-                , button [ class "col-9 btn btn-primary", onClick SendReservation, disabled (not model.agreement) ] [ text "Zaregistrovat se" ]
+                , button [ class "col-9 btn btn-primary", onClick SendReservation, disabled (not model.agreement) ] [ text "Obdarovat" ]
                 ]
             , div [ class "row" ]
                 [ div [ class "col-3" ] []
@@ -285,7 +285,7 @@ viewFamily family =
                 [ span [ class "col-sm-2" ] [ text firstChild.name ]
                 , span [ class "col-sm-1" ] [ text (String.fromInt firstChild.age) ]
                 , span [ class "col-sm-7" ] [ text firstChild.specifics ]
-                , button [ class "col-sm-2 btn btn-primary", onClick (AddFamilyToSelected family.familyId) ] [ text "Obdarovat" ]
+                , button [ class "col-sm-2 btn btn-primary", onClick (AddFamilyToSelected family.familyId) ] [ text "Vybrat" ]
                 ]
                 :: List.map
                     (\child ->
