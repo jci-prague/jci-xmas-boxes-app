@@ -1,4 +1,4 @@
-module Main exposing (main)
+port module Main exposing (main)
 
 import Browser as Browser exposing (element)
 import Html exposing (Html, div)
@@ -73,7 +73,7 @@ update msg model =
                 , families = families
                 , viewableFamilies = viewableFamilies
               }
-            , Cmd.none
+            , familyChosen ""
             )
 
         RemoveFamilyFromSelected familyId ->
@@ -314,3 +314,6 @@ postDonor model =
 
     else
         Cmd.none
+
+
+port familyChosen : String -> Cmd msg
