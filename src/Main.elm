@@ -127,7 +127,7 @@ update msg model =
                 | errorMessage = Nothing
                 , successMessage = Nothing
               }
-            , postDonor model
+            , Cmd.batch [ postDonor model, donateClicked "" ]
             )
 
         PostDonorResponse (Ok _) ->
@@ -317,3 +317,6 @@ postDonor model =
 
 
 port familyChosen : String -> Cmd msg
+
+
+port donateClicked : String -> Cmd msg
