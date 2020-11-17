@@ -272,7 +272,7 @@ main =
 
 
 initSubscriptions : model -> Sub msg
-initSubscriptions model =
+initSubscriptions _ =
     Sub.none
 
 

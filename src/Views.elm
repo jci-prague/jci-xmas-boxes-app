@@ -8,6 +8,7 @@ import Html
     exposing
         ( Html
         , a
+        , b
         , button
         , div
         , input
@@ -282,7 +283,8 @@ viewFamily family =
 
         childRows =
             div [ class "row margin-top-1-5em family-background" ]
-                [ span [ class "col-sm-2" ] [ text firstChild.name ]
+                [ viewSiblingsHeading family.children
+                , span [ class "col-sm-2" ] [ text firstChild.name ]
                 , span [ class "col-sm-1" ] [ text (String.fromInt firstChild.age) ]
                 , span [ class "col-sm-7" ] [ text firstChild.specifics ]
                 , button [ class "col-sm-2 btn btn-primary", onClick (AddFamilyToSelected family.familyId) ] [ text "Vybrat" ]
@@ -299,3 +301,12 @@ viewFamily family =
                     otherChildren
     in
     div [] childRows
+
+
+viewSiblingsHeading : ChildList -> Html Msg
+viewSiblingsHeading children =
+    if List.length children > 1 then
+        span [ class "col-sm-12" ] [ b [] [ text "Sourozenci:" ] ]
+
+    else
+        span [] []
