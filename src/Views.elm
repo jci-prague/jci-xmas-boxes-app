@@ -18,7 +18,8 @@ import Html
         )
 import Html.Attributes
     exposing
-        ( class
+        ( checked
+        , class
         , disabled
         , for
         , href
@@ -26,6 +27,7 @@ import Html.Attributes
         , placeholder
         , target
         , type_
+        , value
         )
 import Html.Events exposing (onClick, onInput)
 import Types
@@ -131,11 +133,11 @@ reservationFormView model =
         [ div [ class "col-sm" ]
             [ div [ class "row form-group" ]
                 [ label [ class "col", for "name" ] [ text "Jméno" ]
-                , input [ class "col-9 input-control", type_ "text", name "name", placeholder "Jméno", onInput UpdateName ] []
+                , input [ class "col-9 input-control", type_ "text", name "name", placeholder "Jméno", value (Maybe.withDefault "" model.donorName), onInput UpdateName ] []
                 ]
             , div [ class "row form-group" ]
                 [ label [ class "col", for "email" ] [ text "Email" ]
-                , input [ class "col-9 input-control", type_ "text", name "email", placeholder "jirka@seznam.cz", onInput UpdateEmail ] []
+                , input [ class "col-9 input-control", type_ "text", name "email", placeholder "jirka@seznam.cz", value (Maybe.withDefault "" model.donorEmail), onInput UpdateEmail ] []
                 ]
             , div [ class "row" ]
                 [ span [ class "col" ] [ text "Vybrané děti" ]
@@ -144,10 +146,10 @@ reservationFormView model =
             , div [ class "row form-group" ]
                 [ span [ class "col" ] [ text "" ]
                 , label [ class "col-9 form-check-label" ]
-                    [ input [ type_ "checkbox", onClick ToggleAgreement ] []
+                    [ input [ type_ "checkbox", checked model.agreement, onClick ToggleAgreement ] []
                     , span []
                         [ text "  Souhlasím se "
-                        , a [ href "/gdpr/", target "_blank" ] [ text "zpracováním poskytnutách osobních údajů" ]
+                        , a [ href "/gdpr/", target "_blank" ] [ text "zpracováním poskytnutých osobních údajů" ]
                         , text "."
                         ]
                     ]

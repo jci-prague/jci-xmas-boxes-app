@@ -132,12 +132,19 @@ update msg model =
 
         PostDonorResponse (Ok _) ->
             ( { model
-                | donorEmail = Maybe.Nothing
-                , donorName = Maybe.Nothing
+                | families = []
+                , viewableFamilies = []
+                , bottomThreshold = 1
+                , topThreshold = 17
+                , selectedGender = NotImportant
                 , selectedFamilies = []
+                , donorName = Maybe.Nothing
+                , donorEmail = Maybe.Nothing
                 , successMessage = Just "Vaše rezervace byla úspěšně zpracována. Na zadanou emailovou adresu Vám přijde potvrzovací email."
+                , errorMessage = Maybe.Nothing
+                , agreement = False
               }
-            , Cmd.none
+            , fetchFamilyList
             )
 
         PostDonorResponse (Err error) ->
@@ -163,7 +170,7 @@ update msg model =
             ( { model
                 | errorMessage = Just ("Je nám líto, ale během zpracování Vaší rezervace nastala chyba. Zkuste to, prosím, ještě jednou. (" ++ errorString ++ ")")
               }
-            , fetchFamilyList
+            , Cmd.none
             )
 
         ToggleAgreement ->
