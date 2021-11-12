@@ -1,5 +1,8 @@
 module Types exposing
-    ( Child
+    ( Address
+    , Center
+    , CenterId(..)
+    , Child
     , ChildList
     , Families
     , Family
@@ -8,6 +11,8 @@ module Types exposing
     , Gender(..)
     , Model
     , Msg(..)
+    , Place
+    , PlaceId(..)
     , PostGiftApiResultType
     , PostGiftApiType
     , genderToString
@@ -35,8 +40,22 @@ genderToString gender =
             "Not Important"
 
 
+type CenterId
+    = CenterId String
+
+
 type FamilyId
     = FamilyId String
+
+
+type PlaceId
+    = PlaceId String
+
+
+type alias Address =
+    { city : String
+    , street : String
+    }
 
 
 type alias Child =
@@ -49,6 +68,16 @@ type alias Child =
 
 type alias ChildList =
     List Child
+
+
+type alias Center =
+    { address : Address
+    , available : Bool
+    , centerId : CenterId
+    , name : String
+    , placeId : PlaceId
+    , universal : Bool
+    }
 
 
 type alias Family =
@@ -76,6 +105,13 @@ type alias PostGiftApiResultType =
 type alias PostGiftApiType =
     { success : Bool
     , results : List PostGiftApiResultType
+    }
+
+
+type alias Place =
+    { available : Bool
+    , name : String
+    , placeId : PlaceId
     }
 
 
