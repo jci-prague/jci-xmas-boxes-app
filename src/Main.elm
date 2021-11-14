@@ -2,12 +2,11 @@ port module Main exposing (main)
 
 import Browser as Browser exposing (element)
 import Html exposing (Html, div)
-import Http exposing (get, send)
-import List as List
+import Http as Http
 import Requests
     exposing
-        ( familiesDecoder
-        , postGiftApiTypeDecoder
+        ( fetchFamilies
+        , postGift
         )
 import Types
     exposing
@@ -144,7 +143,7 @@ update msg model =
                 , errorMessage = Maybe.Nothing
                 , agreement = False
               }
-            , fetchFamilyList
+            , fetchFamilies
             )
 
         PostDonorResponse (Err error) ->
@@ -162,10 +161,10 @@ update msg model =
                             "Network Error"
 
                         Http.BadStatus response ->
-                            "Bad Status: " ++ String.fromInt response.status.code ++ "(" ++ response.status.message ++ ")"
+                            "Bad Status: " ++ String.fromInt response
 
-                        Http.BadPayload message _ ->
-                            "Bad Payload: " ++ message
+                        Http.BadBody message ->
+                            "Bad Body: " ++ message
             in
             ( { model
                 | errorMessage = Just ("Je nám líto, ale během zpracování Vaší rezervace nastala chyba. Zkuste to, prosím, ještě jednou. (" ++ errorString ++ ")")
@@ -264,7 +263,7 @@ initialModel _ =
       , errorMessage = Maybe.Nothing
       , agreement = False
       }
-    , fetchFamilyList
+    , fetchFamilies
     )
 
 
@@ -281,16 +280,6 @@ main =
 initSubscriptions : model -> Sub msg
 initSubscriptions _ =
     Sub.none
-
-
-fetchFamilyList : Cmd Msg
-fetchFamilyList =
-    Http.send FetchFamilyResponse getFamilyList
-
-
-getFamilyList : Http.Request Families
-getFamilyList =
-    Http.get "/api/family" familiesDecoder
 
 
 postDonor : Model -> Cmd Msg
@@ -316,8 +305,7 @@ postDonor model =
             model.selectedFamilies
     in
     if name /= "" && email /= "" then
-        Http.post "/api/family/gift" (Http.jsonBody (Requests.giftEncoder families name email)) postGiftApiTypeDecoder
-            |> Http.send PostDonorResponse
+        postGift families name email
 
     else
         Cmd.none

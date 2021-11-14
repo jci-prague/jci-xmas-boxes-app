@@ -1,15 +1,29 @@
 module Requests exposing
-    ( familiesDecoder
-    , giftEncoder
-    , postGiftApiTypeDecoder
+    ( fetchFamilies
+    , postGift
     )
 
-import Json.Decode as Decode exposing (Decoder, bool, int, list, string)
+import Http
+    exposing
+        ( expectJson
+        , get
+        )
+import Json.Decode as Decode
+    exposing
+        ( Decoder
+        , bool
+        , int
+        , list
+        , string
+        )
 import Json.Decode.Pipeline exposing (required)
 import Json.Encode as Encode exposing (Value)
 import Types
     exposing
-        ( Child
+        ( Address
+        , Center
+        , CenterId(..)
+        , Child
         , ChildList
         , Families
         , Family
@@ -17,9 +31,60 @@ import Types
         , FamilyList
         , Gender(..)
         , Msg(..)
+        , PlaceId(..)
         , PostGiftApiResultType
         , PostGiftApiType
         )
+
+
+fetchFamilies : Cmd Msg
+fetchFamilies =
+    let
+        req =
+            { url = "/api/family"
+            , expect = Http.expectJson FetchFamilyResponse familiesDecoder
+            }
+    in
+    Http.get req
+
+
+postGift : FamilyList -> String -> String -> Cmd Msg
+postGift familyList name email =
+    let
+        req =
+            { body = Http.jsonBody (giftEncoder familyList name email)
+            , url = "/api/family/gift"
+            , expect = Http.expectJson PostDonorResponse postGiftApiTypeDecoder
+            }
+    in
+    Http.post req
+
+
+addressDecoder : Decoder Address
+addressDecoder =
+    Decode.succeed Address
+        |> required "city" string
+        |> required "street" string
+
+
+centerDecoder : Decoder Center
+centerDecoder =
+    Decode.succeed Center
+        |> required "address" addressDecoder
+        |> required "available" bool
+        |> required "id" centerIdDecoder
+        |> required "name" string
+        |> required "place" placeIdDecoder
+        |> required "universal" bool
+
+
+centerIdDecoder : Decoder CenterId
+centerIdDecoder =
+    Decode.string
+        |> Decode.andThen
+            (\id ->
+                Decode.succeed (CenterId id)
+            )
 
 
 giftEncoder : FamilyList -> String -> String -> Value
@@ -109,6 +174,15 @@ familiesDecoder : Decoder Families
 familiesDecoder =
     Decode.succeed Families
         |> required "families" familyListDecoder
+
+
+placeIdDecoder : Decoder PlaceId
+placeIdDecoder =
+    Decode.string
+        |> Decode.andThen
+            (\id ->
+                Decode.succeed (PlaceId id)
+            )
 
 
 postGiftApiResultTypeDecoder : Decoder PostGiftApiResultType
