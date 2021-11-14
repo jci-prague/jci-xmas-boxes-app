@@ -1,5 +1,6 @@
 module Requests exposing
     ( fetchFamilies
+    , fetchKeydata
     , postGift
     )
 
@@ -23,6 +24,7 @@ import Types
         ( Address
         , Center
         , CenterId(..)
+        , CenterList
         , Child
         , ChildList
         , Families
@@ -30,8 +32,11 @@ import Types
         , FamilyId(..)
         , FamilyList
         , Gender(..)
+        , KeydataApi
         , Msg(..)
+        , Place
         , PlaceId(..)
+        , PlaceList
         , PostGiftApiResultType
         , PostGiftApiType
         )
@@ -43,6 +48,17 @@ fetchFamilies =
         req =
             { url = "/api/family"
             , expect = Http.expectJson FetchFamilyResponse familiesDecoder
+            }
+    in
+    Http.get req
+
+
+fetchKeydata : Cmd Msg
+fetchKeydata =
+    let
+        req =
+            { url = "/api/keydata"
+            , expect = Http.expectJson FetchKeydataResponse keydataApiDecoder
             }
     in
     Http.get req
@@ -76,6 +92,11 @@ centerDecoder =
         |> required "name" string
         |> required "place" placeIdDecoder
         |> required "universal" bool
+
+
+centerListDecoder : Decoder CenterList
+centerListDecoder =
+    Decode.list centerDecoder
 
 
 centerIdDecoder : Decoder CenterId
@@ -176,6 +197,21 @@ familiesDecoder =
         |> required "families" familyListDecoder
 
 
+keydataApiDecoder : Decoder KeydataApi
+keydataApiDecoder =
+    Decode.succeed KeydataApi
+        |> required "centers" centerListDecoder
+        |> required "places" placeListDecoder
+
+
+placeDecoder : Decoder Place
+placeDecoder =
+    Decode.succeed Place
+        |> required "available" bool
+        |> required "name" string
+        |> required "id" placeIdDecoder
+
+
 placeIdDecoder : Decoder PlaceId
 placeIdDecoder =
     Decode.string
@@ -183,6 +219,11 @@ placeIdDecoder =
             (\id ->
                 Decode.succeed (PlaceId id)
             )
+
+
+placeListDecoder : Decoder PlaceList
+placeListDecoder =
+    Decode.list placeDecoder
 
 
 postGiftApiResultTypeDecoder : Decoder PostGiftApiResultType

@@ -6,6 +6,7 @@ import Http as Http
 import Requests
     exposing
         ( fetchFamilies
+        , fetchKeydata
         , postGift
         )
 import Types
@@ -107,6 +108,19 @@ update msg model =
             )
 
         FetchFamilyResponse (Err _) ->
+            ( model
+            , Cmd.none
+            )
+
+        FetchKeydataResponse (Ok keydataApi) ->
+            ( { model
+                | centers = keydataApi.centers
+                , places = keydataApi.places
+              }
+            , Cmd.none
+            )
+
+        FetchKeydataResponse (Err _) ->
             ( model
             , Cmd.none
             )
@@ -246,19 +260,21 @@ view model =
 
 initialModel : () -> ( Model, Cmd Msg )
 initialModel _ =
-    ( { families = []
-      , viewableFamilies = []
+    ( { agreement = False
       , bottomThreshold = 1
-      , topThreshold = 17
+      , centers = []
+      , donorEmail = Maybe.Nothing
+      , donorName = Maybe.Nothing
+      , errorMessage = Maybe.Nothing
+      , families = []
+      , places = []
       , selectedGender = NotImportant
       , selectedFamilies = []
-      , donorName = Maybe.Nothing
-      , donorEmail = Maybe.Nothing
       , successMessage = Maybe.Nothing
-      , errorMessage = Maybe.Nothing
-      , agreement = False
+      , topThreshold = 17
+      , viewableFamilies = []
       }
-    , fetchFamilies
+    , Cmd.batch [ fetchKeydata, fetchFamilies ]
     )
 
 

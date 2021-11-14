@@ -2,6 +2,7 @@ module Types exposing
     ( Address
     , Center
     , CenterId(..)
+    , CenterList
     , Child
     , ChildList
     , Families
@@ -9,10 +10,12 @@ module Types exposing
     , FamilyId(..)
     , FamilyList
     , Gender(..)
+    , KeydataApi
     , Model
     , Msg(..)
     , Place
     , PlaceId(..)
+    , PlaceList
     , PostGiftApiResultType
     , PostGiftApiType
     , genderToString
@@ -80,6 +83,10 @@ type alias Center =
     }
 
 
+type alias CenterList =
+    List Center
+
+
 type alias Family =
     { familyId : FamilyId
     , children : ChildList
@@ -92,6 +99,12 @@ type alias FamilyList =
 
 type alias Families =
     { families : FamilyList
+    }
+
+
+type alias KeydataApi =
+    { centers : CenterList
+    , places : PlaceList
     }
 
 
@@ -115,6 +128,10 @@ type alias Place =
     }
 
 
+type alias PlaceList =
+    List Place
+
+
 type Msg
     = SetBottomThreshold Int
     | SetTopThreshold Int
@@ -123,6 +140,7 @@ type Msg
     | RemoveFamilyFromSelected FamilyId
     | SendReservation
     | FetchFamilyResponse (Result Http.Error Families)
+    | FetchKeydataResponse (Result Http.Error KeydataApi)
     | UpdateName String
     | UpdateEmail String
     | PostDonorResponse (Result Http.Error PostGiftApiType)
@@ -130,15 +148,17 @@ type Msg
 
 
 type alias Model =
-    { families : FamilyList
-    , viewableFamilies : FamilyList
+    { agreement : Bool
     , bottomThreshold : Int
-    , topThreshold : Int
+    , centers : CenterList
+    , donorEmail : Maybe String
+    , donorName : Maybe String
+    , errorMessage : Maybe String
+    , families : FamilyList
+    , places : PlaceList
     , selectedGender : Gender
     , selectedFamilies : FamilyList
-    , donorName : Maybe String
-    , donorEmail : Maybe String
     , successMessage : Maybe String
-    , errorMessage : Maybe String
-    , agreement : Bool
+    , topThreshold : Int
+    , viewableFamilies : FamilyList
     }
