@@ -177,11 +177,6 @@ update msg model =
             , Cmd.none
             )
 
-        None ->
-            ( model
-            , Cmd.none
-            )
-
 
 addToSelectedFamilies : Model -> FamilyId -> FamilyList
 addToSelectedFamilies model familyId =

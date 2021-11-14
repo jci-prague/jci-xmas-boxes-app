@@ -127,7 +127,6 @@ type Msg
     | UpdateEmail String
     | PostDonorResponse (Result Http.Error PostGiftApiType)
     | ToggleAgreement
-    | None
 
 
 type alias Model =
