@@ -39,6 +39,7 @@ import Types
         , Gender(..)
         , Model
         , Msg(..)
+        , PlaceList
         )
 
 
@@ -46,6 +47,8 @@ filterFormView : Model -> Html Msg
 filterFormView model =
     div []
         [ div [ class "row form-group" ]
+            (viewPlacesToggleButtons model.places)
+        , div [ class "row form-group" ]
             [ span [ class "col" ] [ text "Věk od" ]
             , button [ class ("col btn " ++ isButtonEqualTreshold model.bottomThreshold 1), onClick (SetBottomThreshold 1) ] [ text "1" ]
             , button [ class ("col btn " ++ isButtonEqualTreshold model.bottomThreshold 2), onClick (SetBottomThreshold 2) ] [ text "2" ]
@@ -93,6 +96,31 @@ filterFormView model =
             [ div [ class "col" ] [ text "Můžeš obdarovat jedno dítě, sourozence (skupina dětí se společným tlačítkem 'Vybrat') nebo i více dětí najednou. Tvoje vybrané děti se objevují ve formuláři pod seznamem. Po kliknutí na tlačítko VYBRAT, odskroluj až úplně dolů a dokonči proces vyplněním formuláře a klinutím na tlačítko OBDAROVAT. Po úspěšné odeslání Ti bude obratem zaslán e-mail se všemi informacemi." ]
             ]
         ]
+
+
+viewPlacesToggleButtons : PlaceList -> List (Html Msg)
+viewPlacesToggleButtons places =
+    let
+        rowLabel =
+            span [ class "col" ] [ text "Město" ]
+
+        placeToggleButtons =
+            places
+                |> List.filter (\place -> place.available)
+                |> List.map
+                    (\place ->
+                        let
+                            btnState =
+                                if place.active then
+                                    "btn-primary"
+
+                                else
+                                    "btn-outline-primary"
+                        in
+                        button [ class ("col btn " ++ btnState), onClick (PlaceToggle place.placeId) ] [ text place.name ]
+                    )
+    in
+    rowLabel :: placeToggleButtons
 
 
 viewFamilies : Model -> Html Msg

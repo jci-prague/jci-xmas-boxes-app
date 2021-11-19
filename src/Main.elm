@@ -186,6 +186,23 @@ update msg model =
             , Cmd.none
             )
 
+        PlaceToggle placeId ->
+            let
+                newPlaces =
+                    List.map
+                        (\place ->
+                            if place.placeId == placeId then
+                                { place | active = not place.active }
+
+                            else
+                                place
+                        )
+                        model.places
+            in
+            ( { model | places = newPlaces }
+            , Cmd.none
+            )
+
         ToggleAgreement ->
             ( { model | agreement = not model.agreement }
             , Cmd.none

@@ -122,7 +122,8 @@ type alias PostGiftApiType =
 
 
 type alias Place =
-    { available : Bool
+    { active : Bool
+    , available : Bool
     , name : String
     , placeId : PlaceId
     }
@@ -143,6 +144,7 @@ type Msg
     | FetchKeydataResponse (Result Http.Error KeydataApi)
     | UpdateName String
     | UpdateEmail String
+    | PlaceToggle PlaceId
     | PostDonorResponse (Result Http.Error PostGiftApiType)
     | ToggleAgreement
 

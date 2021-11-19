@@ -17,7 +17,11 @@ import Json.Decode as Decode
         , list
         , string
         )
-import Json.Decode.Pipeline exposing (required)
+import Json.Decode.Pipeline
+    exposing
+        ( hardcoded
+        , required
+        )
 import Json.Encode as Encode exposing (Value)
 import Types
     exposing
@@ -207,6 +211,7 @@ keydataApiDecoder =
 placeDecoder : Decoder Place
 placeDecoder =
     Decode.succeed Place
+        |> hardcoded True
         |> required "available" bool
         |> required "name" string
         |> required "id" placeIdDecoder
