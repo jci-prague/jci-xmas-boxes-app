@@ -88,8 +88,10 @@ type alias CenterList =
 
 
 type alias Family =
-    { familyId : FamilyId
+    { centerId : CenterId
+    , familyId : FamilyId
     , children : ChildList
+    , placeId : PlaceId
     }
 
 

@@ -186,8 +186,10 @@ familyIdDecoder =
 familyDecoder : Decoder Family
 familyDecoder =
     Decode.succeed Family
+        |> required "centerId" centerIdDecoder
         |> required "id" familyIdDecoder
         |> required "children" childListDecoder
+        |> required "placeId" placeIdDecoder
 
 
 familyListDecoder : Decoder FamilyList

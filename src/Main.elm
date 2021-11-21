@@ -11,13 +11,16 @@ import Requests
         )
 import Types
     exposing
-        ( Families
+        ( CenterId(..)
+        , Families
         , Family
         , FamilyId
         , FamilyList
         , Gender(..)
         , Model
         , Msg(..)
+        , PlaceId(..)
+        , PlaceList
         )
 import Views
     exposing
@@ -33,7 +36,7 @@ update msg model =
         SetBottomThreshold threshold ->
             ( { model
                 | bottomThreshold = threshold
-                , viewableFamilies = filterViewableFamilies threshold model.topThreshold model.selectedGender model.families model.selectedFamilies
+                , viewableFamilies = filterViewableFamilies threshold model.topThreshold model.selectedGender model.places model.families model.selectedFamilies
               }
             , Cmd.none
             )
@@ -41,7 +44,7 @@ update msg model =
         SetTopThreshold threshold ->
             ( { model
                 | topThreshold = threshold
-                , viewableFamilies = filterViewableFamilies model.bottomThreshold threshold model.selectedGender model.families model.selectedFamilies
+                , viewableFamilies = filterViewableFamilies model.bottomThreshold threshold model.selectedGender model.places model.families model.selectedFamilies
               }
             , Cmd.none
             )
@@ -49,7 +52,7 @@ update msg model =
         SetGender gender ->
             ( { model
                 | selectedGender = gender
-                , viewableFamilies = filterViewableFamilies model.bottomThreshold model.topThreshold gender model.families model.selectedFamilies
+                , viewableFamilies = filterViewableFamilies model.bottomThreshold model.topThreshold gender model.places model.families model.selectedFamilies
               }
             , Cmd.none
             )
@@ -66,7 +69,7 @@ update msg model =
 
                 viewableFamilies : FamilyList
                 viewableFamilies =
-                    filterViewableFamilies model.bottomThreshold model.topThreshold model.selectedGender families selectedFamilies
+                    filterViewableFamilies model.bottomThreshold model.topThreshold model.selectedGender model.places families selectedFamilies
             in
             ( { model
                 | selectedFamilies = selectedFamilies
@@ -88,7 +91,7 @@ update msg model =
 
                 viewableFamilies : FamilyList
                 viewableFamilies =
-                    filterViewableFamilies model.bottomThreshold model.topThreshold model.selectedGender families selectedFamilies
+                    filterViewableFamilies model.bottomThreshold model.topThreshold model.selectedGender model.places families selectedFamilies
             in
             ( { model
                 | selectedFamilies = selectedFamilies
@@ -198,8 +201,14 @@ update msg model =
                                 place
                         )
                         model.places
+
+                newViewableFamilies =
+                    filterViewableFamilies model.bottomThreshold model.topThreshold model.selectedGender newPlaces model.families model.selectedFamilies
             in
-            ( { model | places = newPlaces }
+            ( { model
+                | places = newPlaces
+                , viewableFamilies = newViewableFamilies
+              }
             , Cmd.none
             )
 
@@ -229,14 +238,27 @@ removeFromFamilies model familyId =
     List.filter (\f -> familyId /= f.familyId) model.families
 
 
-filterViewableFamilies : Int -> Int -> Gender -> FamilyList -> FamilyList -> FamilyList
-filterViewableFamilies bottom top gender families selectedFamilies =
+filterViewableFamilies : Int -> Int -> Gender -> PlaceList -> FamilyList -> FamilyList -> FamilyList
+filterViewableFamilies bottom top gender places families selectedFamilies =
     List.filter
         (\f ->
             anyChildInAgeRangeAndGender bottom top gender f
                 && not (List.any (\sf -> sf.familyId == f.familyId) selectedFamilies)
+                && familyAtActivePlace places f
         )
         families
+
+
+familyAtActivePlace : PlaceList -> Family -> Bool
+familyAtActivePlace places family =
+    let
+        activePlaces =
+            List.filter (\place -> place.active == True) places
+
+        isFamilyAtActivePlace =
+            List.any (\place -> place.placeId == family.placeId) activePlaces
+    in
+    isFamilyAtActivePlace
 
 
 findFamilyById : FamilyList -> FamilyId -> Family
@@ -253,7 +275,11 @@ findFamilyById families familyId =
             value
 
         Nothing ->
-            { familyId = familyId, children = [] }
+            { centerId = CenterId ""
+            , familyId = familyId
+            , children = []
+            , placeId = PlaceId ""
+            }
 
 
 anyChildInAgeRangeAndGender : Int -> Int -> Gender -> Family -> Bool
