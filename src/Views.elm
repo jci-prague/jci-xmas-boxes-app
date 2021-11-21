@@ -13,6 +13,8 @@ import Html
         , div
         , input
         , label
+        , option
+        , select
         , span
         , text
         )
@@ -166,6 +168,13 @@ reservationFormView model =
             , div [ class "row form-group" ]
                 [ label [ class "col", for "email" ] [ text "Email" ]
                 , input [ class "col-9 input-control", type_ "text", name "email", placeholder "jirka@seznam.cz", value (Maybe.withDefault "" model.donorEmail), onInput UpdateEmail ] []
+                ]
+            , div [ class "row form-group" ]
+                [ label [ class "col", for "center" ] [ text "Místo" ]
+                , select [ class "col-9 input-control", name "center" ]
+                    (List.map (\center ->
+                        option [] [ text center.name ]
+                    ) model.selectableCenters)
                 ]
             , div [ class "row" ]
                 [ span [ class "col" ] [ text "Vybrané děti" ]

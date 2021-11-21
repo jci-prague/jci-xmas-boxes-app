@@ -12,6 +12,7 @@ import Requests
 import Types
     exposing
         ( CenterId(..)
+        , CenterList
         , Families
         , Family
         , FamilyId
@@ -119,6 +120,7 @@ update msg model =
             ( { model
                 | centers = keydataApi.centers
                 , places = keydataApi.places
+                , selectableCenters = filterSelectableCenters keydataApi.places keydataApi.centers
               }
             , Cmd.none
             )
@@ -204,9 +206,12 @@ update msg model =
 
                 newViewableFamilies =
                     filterViewableFamilies model.bottomThreshold model.topThreshold model.selectedGender newPlaces model.families model.selectedFamilies
+                
+                newSelectableCenters = filterSelectableCenters newPlaces model.centers
             in
             ( { model
                 | places = newPlaces
+                , selectableCenters = newSelectableCenters
                 , viewableFamilies = newViewableFamilies
               }
             , Cmd.none
@@ -292,6 +297,29 @@ anyChildInAgeRangeAndGender bottom top gender family =
         family.children
 
 
+filterSelectableCenters : PlaceList -> CenterList -> CenterList
+filterSelectableCenters places centers =
+    let
+        activePlaces =
+            List.filter (\place -> place.active) places
+
+        selectableCenters =
+            List.filter
+                (\center ->
+                    (not center.universal) &&
+                    List.any
+                        (\activePlace ->
+                            activePlace.placeId == center.placeId
+                        )
+                        activePlaces
+                )
+                centers
+        
+        universalCenters = List.filter (\center -> center.universal == True) centers
+    in
+    List.concat [ selectableCenters, universalCenters ]
+
+
 view : Model -> Html Msg
 view model =
     div []
@@ -311,6 +339,7 @@ initialModel _ =
       , errorMessage = Maybe.Nothing
       , families = []
       , places = []
+      , selectableCenters = []
       , selectedGender = NotImportant
       , selectedFamilies = []
       , successMessage = Maybe.Nothing

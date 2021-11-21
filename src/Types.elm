@@ -160,6 +160,7 @@ type alias Model =
     , errorMessage : Maybe String
     , families : FamilyList
     , places : PlaceList
+    , selectableCenters : CenterList
     , selectedGender : Gender
     , selectedFamilies : FamilyList
     , successMessage : Maybe String
