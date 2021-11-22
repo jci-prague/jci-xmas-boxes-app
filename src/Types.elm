@@ -136,19 +136,20 @@ type alias PlaceList =
 
 
 type Msg
-    = SetBottomThreshold Int
-    | SetTopThreshold Int
-    | SetGender Gender
-    | AddFamilyToSelected FamilyId
-    | RemoveFamilyFromSelected FamilyId
-    | SendReservation
+    = AddFamilyToSelected FamilyId
+    | CenterOptionChosen String
     | FetchFamilyResponse (Result Http.Error Families)
     | FetchKeydataResponse (Result Http.Error KeydataApi)
-    | UpdateName String
-    | UpdateEmail String
     | PlaceToggle PlaceId
     | PostDonorResponse (Result Http.Error PostGiftApiType)
+    | RemoveFamilyFromSelected FamilyId
+    | SendReservation
+    | SetBottomThreshold Int
+    | SetTopThreshold Int
+    | SetGender Gender
     | ToggleAgreement
+    | UpdateEmail String
+    | UpdateName String
 
 
 type alias Model =
@@ -161,6 +162,7 @@ type alias Model =
     , families : FamilyList
     , places : PlaceList
     , selectableCenters : CenterList
+    , selectedCenterId : Maybe CenterId
     , selectedGender : Gender
     , selectedFamilies : FamilyList
     , successMessage : Maybe String

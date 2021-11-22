@@ -34,7 +34,8 @@ import Html.Attributes
 import Html.Events exposing (onClick, onInput)
 import Types
     exposing
-        ( Child
+        ( CenterId(..)
+        , Child
         , ChildList
         , Family
         , FamilyId(..)
@@ -171,10 +172,25 @@ reservationFormView model =
                 ]
             , div [ class "row form-group" ]
                 [ label [ class "col", for "center" ] [ text "Místo" ]
-                , select [ class "col-9 input-control", name "center" ]
-                    (List.map (\center ->
-                        option [] [ text center.name ]
-                    ) model.selectableCenters)
+                , select [ class "col-9 input-control", name "center", onInput CenterOptionChosen ]
+                    (model.selectableCenters
+                        |> List.map
+                            (\center ->
+                                let
+                                    id =
+                                        case center.centerId of
+                                            CenterId idString ->
+                                                idString
+                                in
+                                { id = id
+                                , name = center.name
+                                }
+                            )
+                        |> List.map
+                            (\c ->
+                                option [ value c.id ] [ text c.name ]
+                            )
+                    )
                 ]
             , div [ class "row" ]
                 [ span [ class "col" ] [ text "Vybrané děti" ]

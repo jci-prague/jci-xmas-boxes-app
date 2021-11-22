@@ -34,6 +34,11 @@ import Views
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        CenterOptionChosen centerId ->
+            ( { model | selectedCenterId = Just (CenterId centerId) }
+            , Cmd.none
+            )
+
         SetBottomThreshold threshold ->
             ( { model
                 | bottomThreshold = threshold
@@ -206,8 +211,9 @@ update msg model =
 
                 newViewableFamilies =
                     filterViewableFamilies model.bottomThreshold model.topThreshold model.selectedGender newPlaces model.families model.selectedFamilies
-                
-                newSelectableCenters = filterSelectableCenters newPlaces model.centers
+
+                newSelectableCenters =
+                    filterSelectableCenters newPlaces model.centers
             in
             ( { model
                 | places = newPlaces
@@ -306,16 +312,17 @@ filterSelectableCenters places centers =
         selectableCenters =
             List.filter
                 (\center ->
-                    (not center.universal) &&
-                    List.any
-                        (\activePlace ->
-                            activePlace.placeId == center.placeId
-                        )
-                        activePlaces
+                    not center.universal
+                        && List.any
+                            (\activePlace ->
+                                activePlace.placeId == center.placeId
+                            )
+                            activePlaces
                 )
                 centers
-        
-        universalCenters = List.filter (\center -> center.universal == True) centers
+
+        universalCenters =
+            List.filter (\center -> center.universal == True) centers
     in
     List.concat [ selectableCenters, universalCenters ]
 
@@ -341,6 +348,7 @@ initialModel _ =
       , places = []
       , selectableCenters = []
       , selectedGender = NotImportant
+      , selectedCenterId = Maybe.Nothing
       , selectedFamilies = []
       , successMessage = Maybe.Nothing
       , topThreshold = 17
