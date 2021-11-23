@@ -68,11 +68,11 @@ fetchKeydata =
     Http.get req
 
 
-postGift : FamilyList -> String -> String -> Cmd Msg
-postGift familyList name email =
+postGift : FamilyList -> String -> String -> CenterId -> Cmd Msg
+postGift familyList name email centerId =
     let
         req =
-            { body = Http.jsonBody (giftEncoder familyList name email)
+            { body = Http.jsonBody (giftEncoder familyList name email centerId)
             , url = "/api/family/gift"
             , expect = Http.expectJson PostDonorResponse postGiftApiTypeDecoder
             }
@@ -112,15 +112,21 @@ centerIdDecoder =
             )
 
 
-giftEncoder : FamilyList -> String -> String -> Value
-giftEncoder families name email =
+giftEncoder : FamilyList -> String -> String -> CenterId -> Value
+giftEncoder families name email centerId =
     let
         familyIds : List FamilyId
         familyIds =
             List.map (\f -> f.familyId) families
+
+        centerIdString =
+            case centerId of
+                CenterId id ->
+                    id
     in
     Encode.object
-        [ ( "donor", donorEncoder name email )
+        [ ( "centerId", Encode.string centerIdString )
+        , ( "donor", donorEncoder name email )
         , ( "familyIds", familyIdListEncoder familyIds )
         ]
 

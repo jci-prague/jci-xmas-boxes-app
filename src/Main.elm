@@ -11,7 +11,8 @@ import Requests
         )
 import Types
     exposing
-        ( CenterId(..)
+        ( Center
+        , CenterId(..)
         , CenterList
         , Families
         , Family
@@ -35,7 +36,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         CenterOptionChosen centerId ->
-            ( { model | selectedCenterId = Just (CenterId centerId) }
+            ( { model | selectedCenterId = CenterId centerId }
             , Cmd.none
             )
 
@@ -126,6 +127,7 @@ update msg model =
                 | centers = keydataApi.centers
                 , places = keydataApi.places
                 , selectableCenters = filterSelectableCenters keydataApi.places keydataApi.centers
+                , selectedCenterId = (findUniversalCenter keydataApi.centers).centerId
               }
             , Cmd.none
             )
@@ -321,10 +323,32 @@ filterSelectableCenters places centers =
                 )
                 centers
 
-        universalCenters =
-            List.filter (\center -> center.universal == True) centers
+        universalCenter =
+            findUniversalCenter centers
     in
-    List.concat [ selectableCenters, universalCenters ]
+    List.append selectableCenters [universalCenter]
+
+
+findUniversalCenter : CenterList -> Center
+findUniversalCenter centers =
+    centers
+        |> List.filter (\center -> center.universal == True)
+        |> List.head
+        |> Maybe.withDefault failingUniversalCenter
+
+
+failingUniversalCenter : Center
+failingUniversalCenter =
+    { address =
+        { city = "Chybějící univerzální město"
+        , street = "Chybějící univerzální ulice"
+        }
+    , available = True
+    , centerId = CenterId "00000"
+    , name = "Chybějící univerzální místo"
+    , placeId = PlaceId "00000"
+    , universal = True
+    }
 
 
 view : Model -> Html Msg
@@ -348,7 +372,7 @@ initialModel _ =
       , places = []
       , selectableCenters = []
       , selectedGender = NotImportant
-      , selectedCenterId = Maybe.Nothing
+      , selectedCenterId = CenterId "00000"
       , selectedFamilies = []
       , successMessage = Maybe.Nothing
       , topThreshold = 17
@@ -396,7 +420,7 @@ postDonor model =
             model.selectedFamilies
     in
     if name /= "" && email /= "" then
-        postGift families name email
+        postGift families name email model.selectedCenterId
 
     else
         Cmd.none

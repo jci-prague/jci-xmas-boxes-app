@@ -162,7 +162,7 @@ type alias Model =
     , families : FamilyList
     , places : PlaceList
     , selectableCenters : CenterList
-    , selectedCenterId : Maybe CenterId
+    , selectedCenterId : CenterId
     , selectedGender : Gender
     , selectedFamilies : FamilyList
     , successMessage : Maybe String

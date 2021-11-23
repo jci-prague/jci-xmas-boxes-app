@@ -27,6 +27,7 @@ import Html.Attributes
         , href
         , name
         , placeholder
+        , selected
         , target
         , type_
         , value
@@ -172,24 +173,27 @@ reservationFormView model =
                 ]
             , div [ class "row form-group" ]
                 [ label [ class "col", for "center" ] [ text "Místo" ]
-                , select [ class "col-9 input-control", name "center", onInput CenterOptionChosen ]
-                    (model.selectableCenters
-                        |> List.map
-                            (\center ->
-                                let
-                                    id =
-                                        case center.centerId of
-                                            CenterId idString ->
-                                                idString
-                                in
-                                { id = id
-                                , name = center.name
-                                }
-                            )
-                        |> List.map
-                            (\c ->
-                                option [ value c.id ] [ text c.name ]
-                            )
+                , select [ class "col-9 input-control", name "center", onInput CenterOptionChosen, value (unpackCenterId model.selectedCenterId) ]
+                    (let
+                        selectedCenterIdString = unpackCenterId model.selectedCenterId
+
+                        selectableCenters =
+                            model.selectableCenters
+                                |> List.map
+                                    (\center ->
+                                        let
+                                            id = unpackCenterId center.centerId
+                                        in
+                                        { id = id
+                                        , name = center.name ++ " - " ++ center.address.street ++ ", " ++ center.address.city
+                                        }
+                                    )
+                                |> List.map
+                                    (\c ->
+                                        option [ value c.id, selected (selectedCenterIdString == c.id)] [ text c.name ]
+                                    )
+                     in
+                     selectableCenters
                     )
                 ]
             , div [ class "row" ]
@@ -365,3 +369,9 @@ viewSiblingsHeading children =
 
     else
         span [] []
+
+
+unpackCenterId : CenterId -> String
+unpackCenterId centerId =
+    case centerId of
+        CenterId id -> id
