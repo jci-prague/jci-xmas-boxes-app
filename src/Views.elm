@@ -116,10 +116,10 @@ viewPlacesToggleButtons places =
                         let
                             btnState =
                                 if place.active then
-                                    "btn-primary"
+                                    "btn-primary city-btn"
 
                                 else
-                                    "btn-outline-primary"
+                                    "btn-outline-primary city-btn"
                         in
                         button [ class ("col btn " ++ btnState), onClick (PlaceToggle place.placeId) ] [ text place.name ]
                     )
