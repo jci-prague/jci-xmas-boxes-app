@@ -4,5 +4,6 @@ node_modules/
 
 *.iml
 
+admin-app.js
 choose-kid-form.js
 index.html

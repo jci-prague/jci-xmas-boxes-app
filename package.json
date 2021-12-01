@@ -4,9 +4,11 @@
   "description": "Interactive form to choose kids to gift",
   "scripts": {
     "build": "elm make --output=choose-kid-form.js --optimize src/Main.elm",
+    "build:admin": "elm make --output=admin-app.js --optimize src/AdminMain.elm",
     "format": "npx elm-format src/* --yes",
     "run:dev": "elm-live src/Main.elm --dir=./  --start-page=index.html -- --output=choose-kid-form.js",
-    "run:dev:debug": "elm-live src/Main.elm --dir=./ --start-page=index.html -- --output=choose-kid-form.js --debug"
+    "run:dev:debug": "elm-live src/Main.elm --dir=./ --start-page=index.html -- --output=choose-kid-form.js --debug",
+    "run:admin:dev:debug": "elm-live src/AdminMain.elm --dir=./ --start-page=admin.html -- --output=admin-app.js --debug"
   },
   "repository": {
     "type": "git",
@@ -20,6 +22,7 @@
   "devDependencies": {
     "elm-format": "^0.8.5",
     "elm-json": "^0.2.10",
+    "elm-live": "^4.0.2",
     "elm-outdated": "^1.1.0"
   }
 }
