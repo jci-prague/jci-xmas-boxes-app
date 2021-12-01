@@ -11,6 +11,7 @@ import Html
         , b
         , button
         , div
+        , i
         , input
         , label
         , option
@@ -92,9 +93,18 @@ filterFormView model =
             ]
         , div [ class "row form-group" ]
             [ span [ class "col" ] [ text "Pohlaví" ]
-            , button [ class ("col btn " ++ isGenderEqualSelected model.selectedGender Male), onClick (SetGender Male) ] [ text "Kluk" ]
-            , button [ class ("col btn " ++ isGenderEqualSelected model.selectedGender Female), onClick (SetGender Female) ] [ text "Holka" ]
-            , button [ class ("col btn " ++ isGenderEqualSelected model.selectedGender NotImportant), onClick (SetGender NotImportant) ] [ text "Nezáleží" ]
+            , button [ class ("col btn " ++ isGenderEqualSelectedClass model.selectedGender Male), onClick (SetGender Male) ]
+                [ isGenderEqualSelectedIcon model.selectedGender Male
+                , text " Kluk"
+                ]
+            , button [ class ("col btn " ++ isGenderEqualSelectedClass model.selectedGender Female), onClick (SetGender Female) ]
+                [ isGenderEqualSelectedIcon model.selectedGender Female
+                , text " Holka"
+                ]
+            , button [ class ("col btn " ++ isGenderEqualSelectedClass model.selectedGender NotImportant), onClick (SetGender NotImportant) ]
+                [ isGenderEqualSelectedIcon model.selectedGender NotImportant
+                , text " Nezáleží"
+                ]
             ]
         , div [ class "row" ]
             [ div [ class "col" ] [ text "Můžeš obdarovat jedno dítě, sourozence (skupina dětí se společným tlačítkem 'Vybrat') nebo i více dětí najednou. Tvoje vybrané děti se objevují ve formuláři pod seznamem. Po kliknutí na tlačítko VYBRAT, odskroluj až úplně dolů a dokonči proces vyplněním formuláře a klinutím na tlačítko OBDAROVAT. Po úspěšné odeslání Ti bude obratem zaslán e-mail se všemi informacemi." ]
@@ -121,7 +131,14 @@ viewPlacesToggleButtons places =
                                 else
                                     "btn-outline-primary city-btn"
                         in
-                        button [ class ("col btn " ++ btnState), onClick (PlaceToggle place.placeId) ] [ text place.name ]
+                        button [ class ("col btn " ++ btnState), onClick (PlaceToggle place.placeId) ]
+                            [ if place.active then
+                                i [ class "fa fa-check-circle" ] []
+
+                              else
+                                i [ class "fa fa-ban" ] []
+                            , text (" " ++ place.name)
+                            ]
                     )
     in
     rowLabel :: placeToggleButtons
@@ -175,14 +192,16 @@ reservationFormView model =
                 [ label [ class "col", for "center" ] [ text "Místo" ]
                 , select [ class "col-9 input-control", name "center", onInput CenterOptionChosen, value (unpackCenterId model.selectedCenterId) ]
                     (let
-                        selectedCenterIdString = unpackCenterId model.selectedCenterId
+                        selectedCenterIdString =
+                            unpackCenterId model.selectedCenterId
 
                         selectableCenters =
                             model.selectableCenters
                                 |> List.map
                                     (\center ->
                                         let
-                                            id = unpackCenterId center.centerId
+                                            id =
+                                                unpackCenterId center.centerId
                                         in
                                         { id = id
                                         , name = center.name ++ " - " ++ center.address.street ++ ", " ++ center.address.city
@@ -190,7 +209,7 @@ reservationFormView model =
                                     )
                                 |> List.map
                                     (\c ->
-                                        option [ value c.id, selected (selectedCenterIdString == c.id)] [ text c.name ]
+                                        option [ value c.id, selected (selectedCenterIdString == c.id) ] [ text c.name ]
                                     )
                      in
                      selectableCenters
@@ -247,13 +266,31 @@ isButtonEqualTreshold currentTreshold buttonTreshold =
         "btn-outline-primary"
 
 
-isGenderEqualSelected : Gender -> Gender -> String
+isGenderEqualSelected : Gender -> Gender -> Bool
 isGenderEqualSelected selectedGender buttonGender =
     if selectedGender == buttonGender then
+        True
+
+    else
+        False
+
+
+isGenderEqualSelectedClass : Gender -> Gender -> String
+isGenderEqualSelectedClass selectedGender buttonGender =
+    if isGenderEqualSelected selectedGender buttonGender then
         "btn-primary"
 
     else
         "btn-outline-primary"
+
+
+isGenderEqualSelectedIcon : Gender -> Gender -> Html msg
+isGenderEqualSelectedIcon selectedGender buttonGender =
+    if isGenderEqualSelected selectedGender buttonGender then
+        i [ class "fa fa-check-circle" ] []
+
+    else
+        i [ class "fa fa-ban" ] []
 
 
 viewSelectedFamilies : Model -> Html Msg
@@ -374,4 +411,5 @@ viewSiblingsHeading children =
 unpackCenterId : CenterId -> String
 unpackCenterId centerId =
     case centerId of
-        CenterId id -> id
+        CenterId id ->
+            id

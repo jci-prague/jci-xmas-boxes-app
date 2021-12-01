@@ -326,7 +326,7 @@ filterSelectableCenters places centers =
         universalCenter =
             findUniversalCenter centers
     in
-    List.append selectableCenters [universalCenter]
+    List.append selectableCenters [ universalCenter ]
 
 
 findUniversalCenter : CenterList -> Center
