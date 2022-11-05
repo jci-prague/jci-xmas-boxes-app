@@ -21,8 +21,8 @@
   },
   "devDependencies": {
     "elm-format": "^0.8.5",
-    "elm-json": "^0.2.10",
+    "elm-json": "^0.2.13",
     "elm-live": "^4.0.2",
-    "elm-outdated": "^1.1.0"
+    "elm-outdated": "^1.1.1"
   }
 }
