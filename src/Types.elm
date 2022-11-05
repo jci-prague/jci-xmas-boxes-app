@@ -149,14 +149,19 @@ type Msg
     | SetGender Gender
     | ToggleAgreement
     | UpdateEmail String
+    | UpdateEmail2 String
     | UpdateName String
 
 
 type alias Model =
     { agreement : Bool
+
+    -- , appState : AppState
     , bottomThreshold : Int
     , centers : CenterList
     , donorEmail : Maybe String
+    , donorEmail2 : Maybe String
+    , donorEmailErrorMessage : Maybe String
     , donorName : Maybe String
     , errorMessage : Maybe String
     , families : FamilyList

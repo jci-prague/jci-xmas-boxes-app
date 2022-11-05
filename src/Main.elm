@@ -1,6 +1,6 @@
 port module Main exposing (main)
 
-import Browser as Browser exposing (element)
+import Browser as Browser
 import Html exposing (Html, div)
 import Http as Http
 import Requests
@@ -147,6 +147,24 @@ update msg model =
             , Cmd.none
             )
 
+        UpdateEmail2 email ->
+            let
+                maybeDonorEmailErrorMessage : Maybe String
+                maybeDonorEmailErrorMessage =
+                    Maybe.andThen
+                        (\donorEmail ->
+                            if donorEmail /= email then
+                                Just "Zadané emailové adresy se neshodují, prosím, zkontrolujte je a opravte."
+
+                            else
+                                Maybe.Nothing
+                        )
+                        model.donorEmail
+            in
+            ( { model | donorEmail2 = Just email, donorEmailErrorMessage = maybeDonorEmailErrorMessage }
+            , Cmd.none
+            )
+
         SendReservation ->
             ( { model
                 | errorMessage = Nothing
@@ -165,6 +183,8 @@ update msg model =
                 , selectedFamilies = []
                 , donorName = Maybe.Nothing
                 , donorEmail = Maybe.Nothing
+                , donorEmail2 = Maybe.Nothing
+                , donorEmailErrorMessage = Maybe.Nothing
                 , successMessage = Just "Vaše rezervace byla úspěšně zpracována. Na zadanou emailovou adresu Vám přijde potvrzovací email."
                 , errorMessage = Maybe.Nothing
                 , agreement = False
@@ -363,9 +383,13 @@ view model =
 initialModel : () -> ( Model, Cmd Msg )
 initialModel _ =
     ( { agreement = False
+
+      -- , appState = Start
       , bottomThreshold = 1
       , centers = []
       , donorEmail = Maybe.Nothing
+      , donorEmail2 = Maybe.Nothing
+      , donorEmailErrorMessage = Maybe.Nothing
       , donorName = Maybe.Nothing
       , errorMessage = Maybe.Nothing
       , families = []

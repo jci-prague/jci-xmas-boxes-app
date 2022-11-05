@@ -189,6 +189,17 @@ reservationFormView model =
                 , input [ class "col-9 input-control", type_ "text", name "email", placeholder "jirka@seznam.cz", value (Maybe.withDefault "" model.donorEmail), onInput UpdateEmail ] []
                 ]
             , div [ class "row form-group" ]
+                [ label [ class "col-3", for "email2" ] [ text "Zopakovat email" ]
+                , input [ class "col-9 input-control", type_ "text", name "email2", placeholder "jirka@seznam.cz", value (Maybe.withDefault "" model.donorEmail2), onInput UpdateEmail2 ] []
+                , span [ class "col-3" ] []
+                , case model.donorEmailErrorMessage of
+                    Just message ->
+                        span [ class "col-9 text-danger mt-1" ] [ text message ]
+
+                    Nothing ->
+                        span [ class "col-9 mt-1" ] [ text "" ]
+                ]
+            , div [ class "row form-group" ]
                 [ label [ class "col", for "center" ] [ text "Místo" ]
                 , select [ class "col-9 input-control", name "center", onInput CenterOptionChosen, value (unpackCenterId model.selectedCenterId) ]
                     (let
