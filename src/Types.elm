@@ -1,5 +1,6 @@
 module Types exposing
     ( Address
+    , AppState(..)
     , Center
     , CenterId(..)
     , CenterList
@@ -22,6 +23,11 @@ module Types exposing
     )
 
 import Http as Http
+
+
+type AppState
+    = Start
+    | CityChosen
 
 
 type Gender
@@ -155,8 +161,7 @@ type Msg
 
 type alias Model =
     { agreement : Bool
-
-    -- , appState : AppState
+    , appState : AppState
     , bottomThreshold : Int
     , centers : CenterList
     , donorEmail : Maybe String

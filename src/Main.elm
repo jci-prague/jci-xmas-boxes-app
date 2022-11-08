@@ -11,10 +11,10 @@ import Requests
         )
 import Types
     exposing
-        ( Center
+        ( AppState(..)
+        , Center
         , CenterId(..)
         , CenterList
-        , Families
         , Family
         , FamilyId
         , FamilyList
@@ -109,10 +109,14 @@ update msg model =
             )
 
         FetchFamilyResponse (Ok families) ->
+            let
+                viewableFamilies =
+                    filterViewableFamilies model.bottomThreshold model.topThreshold model.selectedGender model.places families.families []
+            in
             ( { model
                 | families = families.families
                 , selectedFamilies = []
-                , viewableFamilies = families.families
+                , viewableFamilies = viewableFamilies
               }
             , Cmd.none
             )
@@ -123,10 +127,14 @@ update msg model =
             )
 
         FetchKeydataResponse (Ok keydataApi) ->
+            let
+                inactivePlaces =
+                    List.map (\place -> { place | active = False }) keydataApi.places
+            in
             ( { model
                 | centers = keydataApi.centers
-                , places = keydataApi.places
-                , selectableCenters = filterSelectableCenters keydataApi.places keydataApi.centers
+                , places = inactivePlaces
+                , selectableCenters = filterSelectableCenters inactivePlaces keydataApi.centers
                 , selectedCenterId = (findUniversalCenter keydataApi.centers).centerId
               }
             , Cmd.none
@@ -224,10 +232,10 @@ update msg model =
                     List.map
                         (\place ->
                             if place.placeId == placeId then
-                                { place | active = not place.active }
+                                { place | active = True }
 
                             else
-                                place
+                                { place | active = False }
                         )
                         model.places
 
@@ -238,7 +246,8 @@ update msg model =
                     filterSelectableCenters newPlaces model.centers
             in
             ( { model
-                | places = newPlaces
+                | appState = CityChosen
+                , places = newPlaces
                 , selectableCenters = newSelectableCenters
                 , viewableFamilies = newViewableFamilies
               }
@@ -346,7 +355,11 @@ filterSelectableCenters places centers =
         universalCenter =
             findUniversalCenter centers
     in
-    List.append selectableCenters [ universalCenter ]
+    if List.length selectableCenters > 0 then
+        selectableCenters
+
+    else
+        [ universalCenter ]
 
 
 findUniversalCenter : CenterList -> Center
@@ -360,12 +373,12 @@ findUniversalCenter centers =
 failingUniversalCenter : Center
 failingUniversalCenter =
     { address =
-        { city = "Chybějící univerzální město"
-        , street = "Chybějící univerzální ulice"
+        { city = " vyber město, ve kterém budeš děti obdarovávat"
+        , street = "Nejdříve, prosím"
         }
     , available = True
     , centerId = CenterId "00000"
-    , name = "Chybějící univerzální místo"
+    , name = "Odběrové místo není k dispozici"
     , placeId = PlaceId "00000"
     , universal = True
     }
@@ -373,18 +386,23 @@ failingUniversalCenter =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ filterFormView model
-        , viewFamilies model
-        , reservationFormView model
-        ]
+    if model.appState == Start then
+        div []
+            [ filterFormView model
+            ]
+
+    else
+        div []
+            [ filterFormView model
+            , viewFamilies model
+            , reservationFormView model
+            ]
 
 
 initialModel : () -> ( Model, Cmd Msg )
 initialModel _ =
     ( { agreement = False
-
-      -- , appState = Start
+      , appState = Start
       , bottomThreshold = 1
       , centers = []
       , donorEmail = Maybe.Nothing
