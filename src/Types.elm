@@ -83,9 +83,10 @@ type alias Center =
     { address : Address
     , available : Bool
     , centerId : CenterId
+    , globalUniversal : Bool
     , name : String
     , placeId : PlaceId
-    , universal : Bool
+    , placeUniversal : Bool
     }
 
 

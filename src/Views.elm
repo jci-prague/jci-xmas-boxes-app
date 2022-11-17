@@ -14,8 +14,6 @@ import Html
         , i
         , input
         , label
-        , option
-        , select
         , span
         , text
         )
@@ -28,7 +26,6 @@ import Html.Attributes
         , href
         , name
         , placeholder
-        , selected
         , target
         , type_
         , value
@@ -164,7 +161,7 @@ viewFamilies model =
                         (div [ class "row margin-top-1-5em family-list-header" ]
                             [ span [ class "col-sm-2" ] [ text "Jméno" ]
                             , span [ class "col-sm-1" ] [ text "Věk" ]
-                            , span [ class "col-sm-7" ] [ text "Koníčky/záliby" ]
+                            , span [ class "col-sm-7" ] [ text "Přání/záliby" ]
                             , span [ class "col-sm-2" ] [ text "" ]
                             ]
                             :: List.map
@@ -209,32 +206,24 @@ reservationFormView model =
                     Nothing ->
                         span [ class "col-9 mt-1" ] [ text "" ]
                 ]
-            , div [ class "row form-group" ]
-                [ label [ class "col", for "center" ] [ text "Místo" ]
-                , select [ class "col-9 input-control", name "center", onInput CenterOptionChosen, value (unpackCenterId model.selectedCenterId) ]
-                    (let
-                        selectedCenterIdString =
-                            unpackCenterId model.selectedCenterId
+            , div [ class "row" ]
+                [ span [ class "col" ] [ text "Místo" ]
+                , div [ class "col-9" ]
+                    [ text
+                        (let
+                            maybeSelectedCenter =
+                                model.centers
+                                    |> List.filter (\center -> center.centerId == model.selectedCenterId)
+                                    |> List.head
+                         in
+                         case maybeSelectedCenter of
+                            Just center ->
+                                center.name ++ " - " ++ center.address.street ++ ", " ++ center.address.city
 
-                        selectableCenters =
-                            model.selectableCenters
-                                |> List.map
-                                    (\center ->
-                                        let
-                                            id =
-                                                unpackCenterId center.centerId
-                                        in
-                                        { id = id
-                                        , name = center.name ++ " - " ++ center.address.street ++ ", " ++ center.address.city
-                                        }
-                                    )
-                                |> List.map
-                                    (\c ->
-                                        option [ value c.id, selected (selectedCenterIdString == c.id) ] [ text c.name ]
-                                    )
-                     in
-                     selectableCenters
-                    )
+                            Nothing ->
+                                "Místo zatím nelze určit, vyberte si, prosím, dítě nebo více dětí."
+                        )
+                    ]
                 ]
             , div [ class "row" ]
                 [ span [ class "col" ] [ text "Vybrané děti" ]

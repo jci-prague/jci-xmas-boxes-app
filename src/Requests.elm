@@ -4,17 +4,12 @@ module Requests exposing
     , postGift
     )
 
-import Http
-    exposing
-        ( expectJson
-        , get
-        )
+import Http as Http
 import Json.Decode as Decode
     exposing
         ( Decoder
         , bool
         , int
-        , list
         , string
         )
 import Json.Decode.Pipeline
@@ -93,9 +88,10 @@ centerDecoder =
         |> required "address" addressDecoder
         |> required "available" bool
         |> required "id" centerIdDecoder
+        |> required "globalUniversal" bool
         |> required "name" string
         |> required "place" placeIdDecoder
-        |> required "universal" bool
+        |> required "placeUniversal" bool
 
 
 centerListDecoder : Decoder CenterList

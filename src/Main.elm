@@ -77,10 +77,14 @@ update msg model =
                 viewableFamilies : FamilyList
                 viewableFamilies =
                     filterViewableFamilies model.bottomThreshold model.topThreshold model.selectedGender model.places families selectedFamilies
+
+                chosenCenterId =
+                    findSuitableCenterFromSelectedFamilies selectedFamilies model.selectableCenters
             in
             ( { model
-                | selectedFamilies = selectedFamilies
-                , families = families
+                | families = families
+                , selectedCenterId = chosenCenterId
+                , selectedFamilies = selectedFamilies
                 , viewableFamilies = viewableFamilies
               }
             , familyChosen ""
@@ -99,10 +103,14 @@ update msg model =
                 viewableFamilies : FamilyList
                 viewableFamilies =
                     filterViewableFamilies model.bottomThreshold model.topThreshold model.selectedGender model.places families selectedFamilies
+
+                chosenCenterId =
+                    findSuitableCenterFromSelectedFamilies selectedFamilies model.selectableCenters
             in
             ( { model
-                | selectedFamilies = selectedFamilies
-                , families = families
+                | families = families
+                , selectedCenterId = chosenCenterId
+                , selectedFamilies = selectedFamilies
                 , viewableFamilies = viewableFamilies
               }
             , Cmd.none
@@ -122,6 +130,10 @@ update msg model =
             )
 
         FetchFamilyResponse (Err _) ->
+            -- let
+            --     x =
+            --         Debug.log "Error: " e
+            -- in
             ( model
             , Cmd.none
             )
@@ -135,7 +147,7 @@ update msg model =
                 | centers = keydataApi.centers
                 , places = inactivePlaces
                 , selectableCenters = filterSelectableCenters inactivePlaces keydataApi.centers
-                , selectedCenterId = (findUniversalCenter keydataApi.centers).centerId
+                , selectedCenterId = (findGlobalUniversalCenter keydataApi.centers).centerId
               }
             , Cmd.none
             )
@@ -343,7 +355,7 @@ filterSelectableCenters places centers =
         selectableCenters =
             List.filter
                 (\center ->
-                    not center.universal
+                    not center.globalUniversal
                         && List.any
                             (\activePlace ->
                                 activePlace.placeId == center.placeId
@@ -352,20 +364,55 @@ filterSelectableCenters places centers =
                 )
                 centers
 
-        universalCenter =
-            findUniversalCenter centers
+        globalUniversalCenter =
+            findGlobalUniversalCenter centers
     in
     if List.length selectableCenters > 0 then
         selectableCenters
 
     else
-        [ universalCenter ]
+        [ globalUniversalCenter ]
 
 
-findUniversalCenter : CenterList -> Center
-findUniversalCenter centers =
+findSuitableCenterFromSelectedFamilies : FamilyList -> CenterList -> CenterId
+findSuitableCenterFromSelectedFamilies selectedFamilies selectableCenters =
+    let
+        uniqueCentersFromSelectedFamilies =
+            selectedFamilies
+                |> List.map (\family -> family.centerId)
+                |> listUnique
+
+        chosenCenterId : CenterId
+        chosenCenterId =
+            if List.length uniqueCentersFromSelectedFamilies > 1 then
+                let
+                    maybeCenterToView =
+                        selectableCenters
+                            |> List.filter (\center -> center.placeUniversal == True)
+                            |> List.head
+                in
+                case maybeCenterToView of
+                    Just center ->
+                        center.centerId
+
+                    Nothing ->
+                        failingUniversalCenter.centerId
+
+            else
+                let
+                    maybeCenterIdToView =
+                        uniqueCentersFromSelectedFamilies
+                            |> List.head
+                in
+                Maybe.withDefault failingUniversalCenter.centerId maybeCenterIdToView
+    in
+    chosenCenterId
+
+
+findGlobalUniversalCenter : CenterList -> Center
+findGlobalUniversalCenter centers =
     centers
-        |> List.filter (\center -> center.universal == True)
+        |> List.filter (\center -> center.globalUniversal == True)
         |> List.head
         |> Maybe.withDefault failingUniversalCenter
 
@@ -378,9 +425,10 @@ failingUniversalCenter =
         }
     , available = True
     , centerId = CenterId "00000"
+    , globalUniversal = False
     , name = "Odběrové místo není k dispozici"
     , placeId = PlaceId "00000"
-    , universal = True
+    , placeUniversal = False
     }
 
 
@@ -466,6 +514,21 @@ postDonor model =
 
     else
         Cmd.none
+
+
+listUnique : List a -> List a
+listUnique inputList =
+    -- https://medium.com/nerd-for-tech/how-to-get-unique-values-in-an-elm-list-d91ec7dfd0e
+    let
+        incUnique : a -> List a -> List a
+        incUnique elem lst =
+            if List.member elem lst then
+                lst
+
+            else
+                elem :: lst
+    in
+    List.foldr incUnique [] inputList
 
 
 port familyChosen : String -> Cmd msg
