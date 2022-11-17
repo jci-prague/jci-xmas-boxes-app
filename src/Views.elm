@@ -157,7 +157,7 @@ viewFamilies model =
         familyContent =
             if List.length model.families > 0 then
                 if List.length model.viewableFamilies > 0 then
-                    div [ class "col-9 margin-bottom-1em" ]
+                    div [ class "col-sm-12 col-md-9 margin-bottom-1em" ]
                         (div [ class "row margin-top-1-5em family-list-header" ]
                             [ span [ class "col-sm-2" ] [ text "Jméno" ]
                             , span [ class "col-sm-1" ] [ text "Věk" ]
