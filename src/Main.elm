@@ -1,8 +1,16 @@
 port module Main exposing (main)
 
 import Browser as Browser
+import Center
+    exposing
+        ( Center
+        , CenterId(..)
+        , CenterList
+        )
+import GlobalCenter
 import Html exposing (Html, div)
 import Http as Http
+import Place exposing (PlaceId(..), PlaceList)
 import Requests
     exposing
         ( fetchFamilies
@@ -12,17 +20,12 @@ import Requests
 import Types
     exposing
         ( AppState(..)
-        , Center
-        , CenterId(..)
-        , CenterList
         , Family
         , FamilyId
         , FamilyList
         , Gender(..)
         , Model
         , Msg(..)
-        , PlaceId(..)
-        , PlaceList
         )
 import Views
     exposing
@@ -459,6 +462,7 @@ initialModel _ =
       , donorName = Maybe.Nothing
       , errorMessage = Maybe.Nothing
       , families = []
+      , globalCenter = GlobalCenter.createMissingGlobalCenter
       , places = []
       , selectableCenters = []
       , selectedGender = NotImportant

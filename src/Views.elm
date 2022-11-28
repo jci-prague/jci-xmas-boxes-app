@@ -4,6 +4,10 @@ module Views exposing
     , viewFamilies
     )
 
+import Center
+    exposing
+        ( CenterId(..)
+        )
 import Html
     exposing
         ( Html
@@ -31,10 +35,13 @@ import Html.Attributes
         , value
         )
 import Html.Events exposing (onClick, onInput)
+import Place
+    exposing
+        ( PlaceList
+        )
 import Types
     exposing
         ( AppState(..)
-        , CenterId(..)
         , Child
         , ChildList
         , Family
@@ -42,7 +49,6 @@ import Types
         , Gender(..)
         , Model
         , Msg(..)
-        , PlaceList
         )
 
 
@@ -432,10 +438,3 @@ viewActivePlace model =
 
         Nothing ->
             span [] []
-
-
-unpackCenterId : CenterId -> String
-unpackCenterId centerId =
-    case centerId of
-        CenterId id ->
-            id

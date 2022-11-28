@@ -1,9 +1,5 @@
 module Types exposing
-    ( Address
-    , AppState(..)
-    , Center
-    , CenterId(..)
-    , CenterList
+    ( AppState(..)
     , Child
     , ChildList
     , Families
@@ -14,15 +10,26 @@ module Types exposing
     , KeydataApi
     , Model
     , Msg(..)
-    , Place
-    , PlaceId(..)
-    , PlaceList
     , PostGiftApiResultType
     , PostGiftApiType
     , genderToString
     )
 
+import Center
+    exposing
+        ( CenterId(..)
+        , CenterList
+        )
+import GlobalCenter
+    exposing
+        ( GlobalCenter
+        )
 import Http as Http
+import Place
+    exposing
+        ( PlaceId
+        , PlaceList
+        )
 
 
 type AppState
@@ -49,22 +56,8 @@ genderToString gender =
             "Not Important"
 
 
-type CenterId
-    = CenterId String
-
-
 type FamilyId
     = FamilyId String
-
-
-type PlaceId
-    = PlaceId String
-
-
-type alias Address =
-    { city : String
-    , street : String
-    }
 
 
 type alias Child =
@@ -77,21 +70,6 @@ type alias Child =
 
 type alias ChildList =
     List Child
-
-
-type alias Center =
-    { address : Address
-    , available : Bool
-    , centerId : CenterId
-    , globalUniversal : Bool
-    , name : String
-    , placeId : PlaceId
-    , placeUniversal : Bool
-    }
-
-
-type alias CenterList =
-    List Center
 
 
 type alias Family =
@@ -130,18 +108,6 @@ type alias PostGiftApiType =
     }
 
 
-type alias Place =
-    { active : Bool
-    , available : Bool
-    , name : String
-    , placeId : PlaceId
-    }
-
-
-type alias PlaceList =
-    List Place
-
-
 type Msg
     = AddFamilyToSelected FamilyId
     | CenterOptionChosen String
@@ -171,6 +137,7 @@ type alias Model =
     , donorName : Maybe String
     , errorMessage : Maybe String
     , families : FamilyList
+    , globalCenter : GlobalCenter
     , places : PlaceList
     , selectableCenters : CenterList
     , selectedCenterId : CenterId
