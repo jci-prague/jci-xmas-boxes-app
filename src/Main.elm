@@ -7,7 +7,7 @@ import Center
         , CenterId(..)
         , CenterList
         )
-import GlobalCenter
+import GlobalCenter exposing (GlobalCenter)
 import Html exposing (Html, div)
 import Http as Http
 import Place exposing (PlaceId(..), PlaceList)
@@ -145,9 +145,23 @@ update msg model =
             let
                 inactivePlaces =
                     List.map (\place -> { place | active = False }) keydataApi.places
+
+                maybeGlobalCenter =
+                    keydataApi.centers
+                        |> List.filter (\center -> center.globalUniversal == True)
+                        |> List.head
+
+                globalCenter =
+                    case maybeGlobalCenter of
+                        Just center ->
+                            GlobalCenter.createDefinedGlobalCenter center
+
+                        Nothing ->
+                            GlobalCenter.createMissingGlobalCenter
             in
             ( { model
                 | centers = keydataApi.centers
+                , globalCenter = globalCenter
                 , places = inactivePlaces
                 , selectableCenters = filterSelectableCenters inactivePlaces keydataApi.centers
                 , selectedCenterId = (findGlobalUniversalCenter keydataApi.centers).centerId
