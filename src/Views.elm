@@ -46,6 +46,7 @@ import Types
         , ChildList
         , Family
         , FamilyId(..)
+        , FamilyList
         , Gender(..)
         , Model
         , Msg(..)
@@ -57,7 +58,7 @@ filterFormView model =
     if model.appState == Start then
         div []
             [ div [ class "row form-group" ]
-                (viewPlacesToggleButtons model.places)
+                (viewPlacesToggleButtons model.families model.places)
             ]
 
     else
@@ -125,15 +126,24 @@ filterFormView model =
             ]
 
 
-viewPlacesToggleButtons : PlaceList -> List (Html Msg)
-viewPlacesToggleButtons places =
+viewPlacesToggleButtons : FamilyList -> PlaceList -> List (Html Msg)
+viewPlacesToggleButtons families places =
     let
         rowLabel =
             span [ class "col" ] [ text "Město" ]
 
         placeToggleButtons =
             places
-                |> List.filter (\place -> place.available)
+                |> List.filter
+                    (\place ->
+                        let
+                            countFamilies =
+                                families
+                                    |> List.filter (\family -> family.placeId == place.placeId)
+                                    |> List.length
+                        in
+                        (countFamilies > 0) && place.available
+                    )
                 |> List.map
                     (\place ->
                         let
