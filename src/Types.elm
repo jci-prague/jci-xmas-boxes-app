@@ -140,7 +140,7 @@ type alias Model =
     , globalCenter : GlobalCenter
     , places : PlaceList
     , selectableCenters : CenterList
-    , selectedCenterId : CenterId
+    , selectedCenterId : Maybe CenterId
     , selectedGender : Gender
     , selectedFamilies : FamilyList
     , successMessage : Maybe String

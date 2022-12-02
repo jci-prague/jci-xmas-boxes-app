@@ -6,8 +6,12 @@ import Center
         ( Center
         , CenterId(..)
         , CenterList
+        , failingUniversalCenter
         )
-import GlobalCenter exposing (GlobalCenter)
+import GlobalCenter
+    exposing
+        ( GlobalCenter(..)
+        )
 import Html exposing (Html, div)
 import Http as Http
 import Place exposing (PlaceId(..), PlaceList)
@@ -39,7 +43,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         CenterOptionChosen centerId ->
-            ( { model | selectedCenterId = CenterId centerId }
+            ( { model | selectedCenterId = Just (CenterId centerId) }
             , Cmd.none
             )
 
@@ -81,12 +85,15 @@ update msg model =
                 viewableFamilies =
                     filterViewableFamilies model.bottomThreshold model.topThreshold model.selectedGender model.places families selectedFamilies
 
-                chosenCenterId =
-                    findSuitableCenterFromSelectedFamilies selectedFamilies model.selectableCenters
+                newSelectableCenters =
+                    findSuitableCentersFromSelectedFamilies model.globalCenter selectedFamilies model.selectableCenters
             in
             ( { model
                 | families = families
-                , selectedCenterId = chosenCenterId
+                , selectableCenters = newSelectableCenters
+
+                -- TODO: reset selectedCenterId, if the combination of new selectableCenters does not contain the currently selected
+                -- , selectedCenterId = Just (findGlobalUniversalCenter model.centers).centerId
                 , selectedFamilies = selectedFamilies
                 , viewableFamilies = viewableFamilies
               }
@@ -107,12 +114,15 @@ update msg model =
                 viewableFamilies =
                     filterViewableFamilies model.bottomThreshold model.topThreshold model.selectedGender model.places families selectedFamilies
 
-                chosenCenterId =
-                    findSuitableCenterFromSelectedFamilies selectedFamilies model.selectableCenters
+                newSelectableCenters =
+                    findSuitableCentersFromSelectedFamilies model.globalCenter selectedFamilies model.selectableCenters
             in
             ( { model
                 | families = families
-                , selectedCenterId = chosenCenterId
+                , selectableCenters = newSelectableCenters
+
+                -- TODO: reset selectedCenterId, if the combination of new selectableCenters does not contain the currently selected
+                -- , selectedCenterId = Just (findGlobalUniversalCenter model.centers).centerId
                 , selectedFamilies = selectedFamilies
                 , viewableFamilies = viewableFamilies
               }
@@ -163,8 +173,8 @@ update msg model =
                 | centers = keydataApi.centers
                 , globalCenter = globalCenter
                 , places = inactivePlaces
-                , selectableCenters = filterSelectableCenters inactivePlaces keydataApi.centers
-                , selectedCenterId = (findGlobalUniversalCenter keydataApi.centers).centerId
+                , selectableCenters = filterSelectableCenters model.globalCenter inactivePlaces keydataApi.centers
+                , selectedCenterId = Just (findGlobalUniversalCenter keydataApi.centers).centerId
               }
             , Cmd.none
             )
@@ -218,6 +228,7 @@ update msg model =
                 , topThreshold = 17
                 , selectedGender = NotImportant
                 , selectedFamilies = []
+                , selectedCenterId = Just failingUniversalCenter.centerId
                 , donorName = Maybe.Nothing
                 , donorEmail = Maybe.Nothing
                 , donorEmail2 = Maybe.Nothing
@@ -272,11 +283,16 @@ update msg model =
                     filterViewableFamilies model.bottomThreshold model.topThreshold model.selectedGender newPlaces model.families model.selectedFamilies
 
                 newSelectableCenters =
-                    filterSelectableCenters newPlaces model.centers
+                    filterSelectableCenters model.globalCenter newPlaces model.centers
+
+                newSelectedId =
+                    List.head newSelectableCenters
+                        |> Maybe.map (\center -> center.centerId)
             in
             ( { model
                 | appState = CityChosen
                 , places = newPlaces
+                , selectedCenterId = newSelectedId
                 , selectableCenters = newSelectableCenters
                 , viewableFamilies = newViewableFamilies
               }
@@ -363,8 +379,8 @@ anyChildInAgeRangeAndGender bottom top gender family =
         family.children
 
 
-filterSelectableCenters : PlaceList -> CenterList -> CenterList
-filterSelectableCenters places centers =
+filterSelectableCenters : GlobalCenter -> PlaceList -> CenterList -> CenterList
+filterSelectableCenters globalCenter places centers =
     let
         activePlaces =
             List.filter (\place -> place.active) places
@@ -385,22 +401,31 @@ filterSelectableCenters places centers =
             findGlobalUniversalCenter centers
     in
     if List.length selectableCenters > 0 then
-        selectableCenters
+        case globalCenter of
+            GlobalCenterDefined center ->
+                List.append [ center ] selectableCenters
+
+            GlobalCenterMissing ->
+                selectableCenters
 
     else
         [ globalUniversalCenter ]
 
 
-findSuitableCenterFromSelectedFamilies : FamilyList -> CenterList -> CenterId
-findSuitableCenterFromSelectedFamilies selectedFamilies selectableCenters =
+findSuitableCentersFromSelectedFamilies : GlobalCenter -> FamilyList -> CenterList -> CenterList
+findSuitableCentersFromSelectedFamilies globalCenter selectedFamilies selectableCenters =
     let
-        uniqueCentersFromSelectedFamilies =
+        uniqueCenterIdsFromSelectedFamilies =
             selectedFamilies
                 |> List.map (\family -> family.centerId)
                 |> listUnique
 
-        chosenCenterId : CenterId
-        chosenCenterId =
+        uniqueCentersFromSelectedFamilies =
+            selectableCenters
+                |> List.filter (\center -> List.member center.centerId uniqueCenterIdsFromSelectedFamilies)
+
+        chosenCenterForPlace : Center
+        chosenCenterForPlace =
             if List.length uniqueCentersFromSelectedFamilies > 1 then
                 let
                     maybeCenterToView =
@@ -410,20 +435,25 @@ findSuitableCenterFromSelectedFamilies selectedFamilies selectableCenters =
                 in
                 case maybeCenterToView of
                     Just center ->
-                        center.centerId
+                        center
 
                     Nothing ->
-                        failingUniversalCenter.centerId
+                        failingUniversalCenter
 
             else
                 let
-                    maybeCenterIdToView =
+                    maybeCenterToView =
                         uniqueCentersFromSelectedFamilies
                             |> List.head
                 in
-                Maybe.withDefault failingUniversalCenter.centerId maybeCenterIdToView
+                Maybe.withDefault failingUniversalCenter maybeCenterToView
     in
-    chosenCenterId
+    case globalCenter of
+        GlobalCenterDefined center ->
+            [ center, chosenCenterForPlace ]
+
+        GlobalCenterMissing ->
+            [ chosenCenterForPlace ]
 
 
 findGlobalUniversalCenter : CenterList -> Center
@@ -432,21 +462,6 @@ findGlobalUniversalCenter centers =
         |> List.filter (\center -> center.globalUniversal == True)
         |> List.head
         |> Maybe.withDefault failingUniversalCenter
-
-
-failingUniversalCenter : Center
-failingUniversalCenter =
-    { address =
-        { city = " vyber město, ve kterém budeš děti obdarovávat"
-        , street = "Nejdříve, prosím"
-        }
-    , available = True
-    , centerId = CenterId "00000"
-    , globalUniversal = False
-    , name = "Odběrové místo není k dispozici"
-    , placeId = PlaceId "00000"
-    , placeUniversal = False
-    }
 
 
 view : Model -> Html Msg
@@ -480,7 +495,7 @@ initialModel _ =
       , places = []
       , selectableCenters = []
       , selectedGender = NotImportant
-      , selectedCenterId = CenterId "00000"
+      , selectedCenterId = Nothing
       , selectedFamilies = []
       , successMessage = Maybe.Nothing
       , topThreshold = 17
@@ -528,7 +543,12 @@ postDonor model =
             model.selectedFamilies
     in
     if name /= "" && email /= "" then
-        postGift families name email model.selectedCenterId
+        case model.selectedCenterId of
+            Just centerId ->
+                postGift families name email centerId
+
+            Nothing ->
+                Cmd.none
 
     else
         Cmd.none

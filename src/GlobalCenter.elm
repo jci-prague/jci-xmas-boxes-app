@@ -1,7 +1,8 @@
 module GlobalCenter exposing
-    ( GlobalCenter
+    ( GlobalCenter(..)
     , createDefinedGlobalCenter
     , createMissingGlobalCenter
+    , extractCenter
     , isGlobalCenterDefined
     )
 
@@ -21,6 +22,16 @@ createMissingGlobalCenter =
 createDefinedGlobalCenter : Center -> GlobalCenter
 createDefinedGlobalCenter center =
     GlobalCenterDefined center
+
+
+extractCenter : GlobalCenter -> Maybe Center
+extractCenter gc =
+    case gc of
+        GlobalCenterDefined center ->
+            Just center
+
+        GlobalCenterMissing ->
+            Nothing
 
 
 isGlobalCenterDefined : GlobalCenter -> Bool

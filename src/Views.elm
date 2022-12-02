@@ -7,7 +7,9 @@ module Views exposing
 import Center
     exposing
         ( CenterId(..)
+        , unpackCenterId
         )
+import GlobalCenter
 import Html
     exposing
         ( Html
@@ -18,6 +20,8 @@ import Html
         , i
         , input
         , label
+        , option
+        , select
         , span
         , text
         )
@@ -30,6 +34,7 @@ import Html.Attributes
         , href
         , name
         , placeholder
+          -- , selected
         , target
         , type_
         , value
@@ -225,20 +230,34 @@ reservationFormView model =
             , div [ class "row" ]
                 [ span [ class "col" ] [ text "Místo" ]
                 , div [ class "col-9" ]
-                    [ text
-                        (let
-                            maybeSelectedCenter =
-                                model.centers
-                                    |> List.filter (\center -> center.centerId == model.selectedCenterId)
-                                    |> List.head
-                         in
-                         case maybeSelectedCenter of
-                            Just center ->
-                                center.name ++ " - " ++ center.address.street ++ ", " ++ center.address.city
+                    [ if List.length model.selectableCenters > 1 then
+                        let
+                            selectedCenterIdString =
+                                case model.selectedCenterId of
+                                    Just centerId ->
+                                        unpackCenterId centerId
 
-                            Nothing ->
-                                "Místo zatím nelze určit, vyberte si, prosím, dítě nebo více dětí."
-                        )
+                                    Nothing ->
+                                        ""
+                        in
+                        select [ class "col-9 input-control", name "center", onInput CenterOptionChosen, value selectedCenterIdString ]
+                            (List.map
+                                (\c ->
+                                    -- option [ value (unpackCenterId c.centerId), selected (model.selectedCenterId == c.centerId) ] [ text c.name ]
+                                    option [ value (unpackCenterId c.centerId) ] [ text c.name ]
+                                )
+                                model.selectableCenters
+                            )
+
+                      else
+                        text
+                            (case model.globalCenter of
+                                GlobalCenter.GlobalCenterDefined center ->
+                                    center.name ++ " - " ++ center.address.street ++ ", " ++ center.address.city
+
+                                GlobalCenter.GlobalCenterMissing ->
+                                    "Místo zatím nelze určit, vyberte si, prosím, dítě nebo více dětí."
+                            )
                     ]
                 ]
             , div [ class "row" ]
