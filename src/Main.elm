@@ -8,6 +8,7 @@ import Center
         , CenterList
         , failingUniversalCenter
         , findGlobalUniversalCenter
+        , unpackCenterId
         )
 import GlobalCenter
     exposing
@@ -22,6 +23,7 @@ import Requests
         , fetchKeydata
         , postGift
         )
+import Set
 import Types
     exposing
         ( AppState(..)
@@ -55,8 +57,14 @@ update msg model =
                                 fam
                         )
                         model.selectedFamilies
+
+                newDistinctCentersAmount =
+                    countDistinctiveCentersFromFamilies newSelectedFamilies
             in
-            ( { model | selectedFamilies = newSelectedFamilies }
+            ( { model
+                | distinctSelectedCentersAmount = newDistinctCentersAmount
+                , selectedFamilies = newSelectedFamilies
+              }
             , Cmd.none
             )
 
@@ -100,9 +108,13 @@ update msg model =
 
                 newSelectableCenters =
                     findSuitableCentersFromSelectedFamilies model.globalCenter selectedFamilies model.selectableCenters
+
+                newDistinctCentersAmount =
+                    countDistinctiveCentersFromFamilies selectedFamilies
             in
             ( { model
                 | families = families
+                , distinctSelectedCentersAmount = newDistinctCentersAmount
                 , selectableCenters = newSelectableCenters
 
                 -- TODO: reset selectedCenterId, if the combination of new selectableCenters does not contain the currently selected
@@ -129,9 +141,13 @@ update msg model =
 
                 newSelectableCenters =
                     findSuitableCentersFromSelectedFamilies model.globalCenter selectedFamilies model.selectableCenters
+
+                newDistinctCentersAmount =
+                    countDistinctiveCentersFromFamilies selectedFamilies
             in
             ( { model
                 | families = families
+                , distinctSelectedCentersAmount = newDistinctCentersAmount
                 , selectableCenters = newSelectableCenters
 
                 -- TODO: reset selectedCenterId, if the combination of new selectableCenters does not contain the currently selected
@@ -327,6 +343,27 @@ addToSelectedFamilies model familyId =
     { familyToBeAdded | chosenCenter = Just familyToBeAdded.centerId } :: model.selectedFamilies
 
 
+countDistinctiveCentersFromFamilies : FamilyList -> Int
+countDistinctiveCentersFromFamilies families =
+    let
+        centerIds =
+            List.map
+                (\fam ->
+                    case fam.chosenCenter of
+                        Just centerId ->
+                            unpackCenterId centerId
+
+                        Nothing ->
+                            ""
+                )
+                families
+
+        centerIdsSet =
+            List.foldl (\c acc -> Set.insert c acc) Set.empty centerIds
+    in
+    Set.size centerIdsSet
+
+
 removeFromSelectedFamilies : Model -> FamilyId -> FamilyList
 removeFromSelectedFamilies model familyId =
     List.filter (\f -> familyId /= f.familyId) model.selectedFamilies
@@ -499,6 +536,7 @@ initialModel _ =
       , donorEmail2 = Maybe.Nothing
       , donorEmailErrorMessage = Maybe.Nothing
       , donorName = Maybe.Nothing
+      , distinctSelectedCentersAmount = 0
       , errorMessage = Maybe.Nothing
       , families = []
       , globalCenter = GlobalCenter.createMissingGlobalCenter

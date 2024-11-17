@@ -145,6 +145,7 @@ type alias Model =
     , donorEmail2 : Maybe String
     , donorEmailErrorMessage : Maybe String
     , donorName : Maybe String
+    , distinctSelectedCentersAmount : Int
     , errorMessage : Maybe String
     , families : FamilyList
     , globalCenter : GlobalCenter

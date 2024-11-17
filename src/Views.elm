@@ -252,6 +252,14 @@ reservationFormView model =
                         ]
                     ]
                 ]
+            , if model.distinctSelectedCentersAmount > 1 then
+                div [ class "row" ]
+                    [ span [ class "col" ] []
+                    , span [ class "col-9 alert alert-primary" ] [ text "Upozorňujeme, že máte vybrány děti/sourozence pro více jak jednoho sběrné místo. Není to žádný problém, jen, prosím, zaneste krabice do příslušných sběrných míst, velmi děkujeme! Tým Vanočních krabic" ]
+                    ]
+
+              else
+                span [] []
             , div [ class "row form-group" ]
                 [ span [ class "col" ] [ text "" ]
                 , button [ class "col-9 btn btn-primary", onClick SendReservation, disabled (not model.agreement) ] [ text "Obdarovat" ]
