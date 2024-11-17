@@ -238,7 +238,7 @@ update msg model =
                 | families = []
                 , viewableFamilies = []
                 , bottomThreshold = 1
-                , topThreshold = 17
+                , topThreshold = 19
                 , selectedGender = NotImportant
                 , selectedFamilies = []
                 , selectedCenterId = Just failingUniversalCenter.centerId
@@ -508,7 +508,7 @@ initialModel _ =
       , selectedCenterId = Nothing
       , selectedFamilies = []
       , successMessage = Maybe.Nothing
-      , topThreshold = 17
+      , topThreshold = 19
       , viewableFamilies = []
       }
     , Cmd.batch [ fetchKeydata, fetchFamilies ]
