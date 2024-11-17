@@ -313,8 +313,8 @@ isGenderEqualSelectedIcon selectedGender buttonGender =
 viewSelectedFamilies : Model -> Html Msg
 viewSelectedFamilies model =
     if List.length model.selectedFamilies > 0 then
-        div [ class "row margin-bottom-1em" ]
-            [ div [ class "col" ]
+        div [ class "container margin-bottom-1em" ]
+            [ div [ class "" ]
                 (List.map
                     (\f ->
                         viewSelectedFamily model.centers f
@@ -334,58 +334,41 @@ viewSelectedFamilies model =
 viewSelectedFamily : CenterList -> Family -> Html Msg
 viewSelectedFamily centers family =
     let
-        firstChild : Child
-        firstChild =
-            case List.head family.children of
-                Just child ->
-                    child
-
-                Nothing ->
-                    Child "" 0 NotImportant "" Nothing
-
-        otherChildren : ChildList
-        otherChildren =
-            case List.tail family.children of
-                Just children ->
-                    children
-
-                Nothing ->
-                    []
-
         globalCenter =
             findGlobalUniversalCenter centers
 
         childRows =
             let
-                familyCenterSelect : Family -> Html Msg
-                familyCenterSelect fam =
-                    span [ class "form-group" ]
-                        [ label [ class "col-2 col-form-label" ] [ text "Místo" ]
-                        , select [ class "col form-control", name ("center-" ++ unpackFamilyId fam.familyId), onInput (CenterOptionChosen fam.familyId) ]
+                familyCenterControls : Family -> Html Msg
+                familyCenterControls fam =
+                    div [ class "row form-group" ]
+                        [ label [ class "col-sm-3 col-form-label" ] [ text "Sběrné Místo" ]
+                        , select [ class "col-sm-9 form-control", name ("center-" ++ unpackFamilyId fam.familyId), onInput (CenterOptionChosen fam.familyId) ]
                             [ option [ value (unpackCenterId fam.centerId), selected True ] [ text (.name (findCenterByCenterId centers fam.centerId)) ]
                             , option [ value (unpackCenterId globalCenter.centerId) ] [ text globalCenter.name ]
                             ]
+                        , button [ class "col-sm-2 col-md-2 btn btn-danger", onClick (RemoveFamilyFromSelected fam.familyId) ] [ text "Odebrat" ]
                         ]
+
+                childRow : Child -> Html Msg
+                childRow child =
+                    div [ class "row" ]
+                        [ span [ class "col-sm-1 col-md-2" ] [ text child.name ]
+                        , span [ class "col-sm-1 col-md-1" ] [ text (String.fromInt child.age) ]
+                        , span [ class "col-sm-4 col-md-9" ] [ text child.specifics ]
+                        ]
+
+                childrenRows : ChildList -> List (Html Msg)
+                childrenRows children =
+                    List.map childRow children
             in
-            div [ class "row margin-top-1-5em" ]
-                [ span [ class "col-2" ] [ text firstChild.name ]
-                , span [ class "col-1" ] [ text (String.fromInt firstChild.age) ]
-                , span [ class "col-7" ] [ text firstChild.specifics ]
-                , button [ class "col-2 btn btn-danger", onClick (RemoveFamilyFromSelected family.familyId) ] [ text "Odebrat" ]
-                , familyCenterSelect family
-                ]
-                :: List.map
-                    (\child ->
-                        div [ class "row" ]
-                            [ span [ class "col-sm-2" ] [ text child.name ]
-                            , span [ class "col-sm-1" ] [ text (String.fromInt child.age) ]
-                            , span [ class "col-sm-7" ] [ text child.specifics ]
-                            , span [ class "col-sm-2" ] [ text "" ]
-                            ]
-                    )
-                    otherChildren
+            div [ class "margin-top-1-5em" ]
+                (List.append
+                    (childrenRows family.children)
+                    [ familyCenterControls family ]
+                )
     in
-    div [] childRows
+    div [] [ childRows ]
 
 
 viewFamily : Family -> Html Msg
