@@ -14,6 +14,7 @@ import Center
         , findGlobalUniversalCenter
         , unpackCenterId
         )
+import GlobalCenter exposing (GlobalCenter)
 import Html
     exposing
         ( Html
@@ -113,7 +114,7 @@ filterFormView model =
                 , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 14), onClick (SetTopThreshold 14) ] [ text "14" ]
                 , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 15), onClick (SetTopThreshold 15) ] [ text "15" ]
                 , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 16), onClick (SetTopThreshold 16) ] [ text "16" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 17), onClick (SetTopThreshold 17) ] [ text "17" ]
+                , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 17), onClick (SetTopThreshold 17) ] [ text "17+" ]
                 ]
             , div [ class "row form-group" ]
                 [ span [ class "col" ] [ text "Pohlaví" ]
@@ -343,10 +344,14 @@ viewSelectedFamily centers family =
                 familyCenterControls fam =
                     div [ class "row form-group" ]
                         [ label [ class "col-sm-3 col-form-label" ] [ text "Sběrné Místo" ]
-                        , select [ class "col-sm-9 form-control", name ("center-" ++ unpackFamilyId fam.familyId), onInput (CenterOptionChosen fam.familyId) ]
-                            [ option [ value (unpackCenterId fam.centerId), selected True ] [ text (.name (findCenterByCenterId centers fam.centerId)) ]
-                            , option [ value (unpackCenterId globalCenter.centerId) ] [ text globalCenter.name ]
-                            ]
+                        , if fam.centerId == globalCenter.centerId then
+                            span [ class "col-sm-9" ] [ text globalCenter.name ]
+
+                          else
+                            select [ class "col-sm-9 form-control", name ("center-" ++ unpackFamilyId fam.familyId), onInput (CenterOptionChosen fam.familyId) ]
+                                [ option [ value (unpackCenterId fam.centerId), selected True ] [ text (.name (findCenterByCenterId centers fam.centerId)) ]
+                                , option [ value (unpackCenterId globalCenter.centerId) ] [ text globalCenter.name ]
+                                ]
                         , button [ class "col-sm-2 col-md-2 btn btn-danger", onClick (RemoveFamilyFromSelected fam.familyId) ] [ text "Odebrat" ]
                         ]
 
