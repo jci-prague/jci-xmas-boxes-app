@@ -4,12 +4,16 @@ module Views exposing
     , viewFamilies
     )
 
+-- import GlobalCenter
+
 import Center
     exposing
         ( CenterId(..)
+        , CenterList
+        , findCenterByCenterId
+        , findGlobalUniversalCenter
         , unpackCenterId
         )
-import GlobalCenter
 import Html
     exposing
         ( Html
@@ -34,7 +38,7 @@ import Html.Attributes
         , href
         , name
         , placeholder
-          -- , selected
+        , selected
         , target
         , type_
         , value
@@ -55,6 +59,7 @@ import Types
         , Gender(..)
         , Model
         , Msg(..)
+        , unpackFamilyId
         )
 
 
@@ -228,39 +233,6 @@ reservationFormView model =
                         span [ class "col-9 mt-1" ] [ text "" ]
                 ]
             , div [ class "row" ]
-                [ span [ class "col" ] [ text "Místo" ]
-                , div [ class "col-9" ]
-                    [ if List.length model.selectableCenters > 1 then
-                        let
-                            selectedCenterIdString =
-                                case model.selectedCenterId of
-                                    Just centerId ->
-                                        unpackCenterId centerId
-
-                                    Nothing ->
-                                        ""
-                        in
-                        select [ class "col-9 input-control", name "center", onInput CenterOptionChosen, value selectedCenterIdString ]
-                            (List.map
-                                (\c ->
-                                    -- option [ value (unpackCenterId c.centerId), selected (model.selectedCenterId == c.centerId) ] [ text c.name ]
-                                    option [ value (unpackCenterId c.centerId) ] [ text c.name ]
-                                )
-                                model.selectableCenters
-                            )
-
-                      else
-                        text
-                            (case model.globalCenter of
-                                GlobalCenter.GlobalCenterDefined center ->
-                                    center.name ++ " - " ++ center.address.street ++ ", " ++ center.address.city
-
-                                GlobalCenter.GlobalCenterMissing ->
-                                    "Místo zatím nelze určit, vyberte si, prosím, dítě nebo více dětí."
-                            )
-                    ]
-                ]
-            , div [ class "row" ]
                 [ span [ class "col" ] [ text "Vybrané děti" ]
                 , div [ class "col-9" ] [ viewSelectedFamilies model ]
                 ]
@@ -345,7 +317,7 @@ viewSelectedFamilies model =
             [ div [ class "col" ]
                 (List.map
                     (\f ->
-                        viewSelectedFamily f
+                        viewSelectedFamily model.centers f
                     )
                     model.selectedFamilies
                 )
@@ -359,8 +331,8 @@ viewSelectedFamilies model =
             ]
 
 
-viewSelectedFamily : Family -> Html Msg
-viewSelectedFamily family =
+viewSelectedFamily : CenterList -> Family -> Html Msg
+viewSelectedFamily centers family =
     let
         firstChild : Child
         firstChild =
@@ -369,7 +341,7 @@ viewSelectedFamily family =
                     child
 
                 Nothing ->
-                    Child "" 0 NotImportant ""
+                    Child "" 0 NotImportant "" Nothing
 
         otherChildren : ChildList
         otherChildren =
@@ -380,12 +352,27 @@ viewSelectedFamily family =
                 Nothing ->
                     []
 
+        globalCenter =
+            findGlobalUniversalCenter centers
+
         childRows =
+            let
+                familyCenterSelect : Family -> Html Msg
+                familyCenterSelect fam =
+                    span [ class "form-group" ]
+                        [ label [ class "col-2 col-form-label" ] [ text "Místo" ]
+                        , select [ class "col form-control", name ("center-" ++ unpackFamilyId fam.familyId), onInput (CenterOptionChosen fam.familyId) ]
+                            [ option [ value (unpackCenterId fam.centerId), selected True ] [ text (.name (findCenterByCenterId centers fam.centerId)) ]
+                            , option [ value (unpackCenterId globalCenter.centerId) ] [ text globalCenter.name ]
+                            ]
+                        ]
+            in
             div [ class "row margin-top-1-5em" ]
-                [ span [ class "col-sm-2" ] [ text firstChild.name ]
-                , span [ class "col-sm-1" ] [ text (String.fromInt firstChild.age) ]
-                , span [ class "col-sm-7" ] [ text firstChild.specifics ]
-                , button [ class "col-sm-2 btn btn-danger", onClick (RemoveFamilyFromSelected family.familyId) ] [ text "Odebrat" ]
+                [ span [ class "col-2" ] [ text firstChild.name ]
+                , span [ class "col-1" ] [ text (String.fromInt firstChild.age) ]
+                , span [ class "col-7" ] [ text firstChild.specifics ]
+                , button [ class "col-2 btn btn-danger", onClick (RemoveFamilyFromSelected family.familyId) ] [ text "Odebrat" ]
+                , familyCenterSelect family
                 ]
                 :: List.map
                     (\child ->
@@ -411,7 +398,7 @@ viewFamily family =
                     child
 
                 Nothing ->
-                    Child "" 0 NotImportant ""
+                    Child "" 0 NotImportant "" Nothing
 
         otherChildren : ChildList
         otherChildren =
@@ -427,7 +414,8 @@ viewFamily family =
                 [ viewSiblingsHeading family.children
                 , span [ class "col-sm-2" ] [ text firstChild.name ]
                 , span [ class "col-sm-1" ] [ text (String.fromInt firstChild.age) ]
-                , span [ class "col-sm-7" ] [ text firstChild.specifics ]
+                , span [ class "col-sm-5" ] [ text firstChild.specifics ]
+                , childUrl firstChild
                 , button [ class "col-sm-2 btn btn-primary", onClick (AddFamilyToSelected family.familyId) ] [ text "Vybrat" ]
                 ]
                 :: List.map
@@ -435,13 +423,24 @@ viewFamily family =
                         div [ class "row family-background" ]
                             [ span [ class "col-sm-2" ] [ text child.name ]
                             , span [ class "col-sm-1" ] [ text (String.fromInt child.age) ]
-                            , span [ class "col-sm-7" ] [ text child.specifics ]
+                            , span [ class "col-sm-5" ] [ text child.specifics ]
+                            , childUrl child
                             , span [ class "col-sm-2" ] [ text "" ]
                             ]
                     )
                     otherChildren
     in
     div [] childRows
+
+
+childUrl : Child -> Html Msg
+childUrl child =
+    case child.url of
+        Just url ->
+            a [ href url, target "_blank", class "col-sm-2" ] [ text "Odkaz" ]
+
+        Nothing ->
+            span [ class "col-sm-2" ] [ text "" ]
 
 
 viewSiblingsHeading : ChildList -> Html Msg

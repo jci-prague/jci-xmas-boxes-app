@@ -13,6 +13,7 @@ module Types exposing
     , PostGiftApiResultType
     , PostGiftApiType
     , genderToString
+    , unpackFamilyId
     )
 
 import Center
@@ -60,11 +61,19 @@ type FamilyId
     = FamilyId String
 
 
+unpackFamilyId : FamilyId -> String
+unpackFamilyId familyId =
+    case familyId of
+        FamilyId id ->
+            id
+
+
 type alias Child =
     { name : String
     , age : Int
     , gender : Gender
     , specifics : String
+    , url : Maybe String
     }
 
 
@@ -77,6 +86,7 @@ type alias Family =
     , familyId : FamilyId
     , children : ChildList
     , placeId : PlaceId
+    , chosenCenter : Maybe CenterId
     }
 
 
@@ -110,7 +120,7 @@ type alias PostGiftApiType =
 
 type Msg
     = AddFamilyToSelected FamilyId
-    | CenterOptionChosen String
+    | CenterOptionChosen FamilyId String
     | FetchFamilyResponse (Result Http.Error Families)
     | FetchKeydataResponse (Result Http.Error KeydataApi)
     | PlaceToggle PlaceId

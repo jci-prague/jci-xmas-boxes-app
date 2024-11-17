@@ -10,6 +10,7 @@ import Center
         , Center
         , CenterId(..)
         , CenterList
+        , unpackCenterId
         )
 import Http as Http
 import Json.Decode as Decode
@@ -44,7 +45,14 @@ import Types
         , Msg(..)
         , PostGiftApiResultType
         , PostGiftApiType
+        , unpackFamilyId
         )
+
+
+type alias FamilyCenter =
+    { familyIdString : String
+    , chosenCenterIdString : String
+    }
 
 
 fetchFamilies : Cmd Msg
@@ -69,11 +77,11 @@ fetchKeydata =
     Http.get req
 
 
-postGift : FamilyList -> String -> String -> CenterId -> Cmd Msg
-postGift familyList name email centerId =
+postGift : FamilyList -> String -> String -> Cmd Msg
+postGift familyList name email =
     let
         req =
-            { body = Http.jsonBody (giftEncoder familyList name email centerId)
+            { body = Http.jsonBody (giftEncoder familyList name email)
             , url = "/api/family/gift"
             , expect = Http.expectJson PostDonorResponse postGiftApiTypeDecoder
             }
@@ -114,22 +122,28 @@ centerIdDecoder =
             )
 
 
-giftEncoder : FamilyList -> String -> String -> CenterId -> Value
-giftEncoder families name email centerId =
+giftEncoder : FamilyList -> String -> String -> Value
+giftEncoder families name email =
     let
-        familyIds : List FamilyId
-        familyIds =
-            List.map (\f -> f.familyId) families
+        familyCenters : List FamilyCenter
+        familyCenters =
+            List.map
+                (\f ->
+                    { familyIdString = unpackFamilyId f.familyId
+                    , chosenCenterIdString =
+                        case f.chosenCenter of
+                            Just id ->
+                                unpackCenterId id
 
-        centerIdString =
-            case centerId of
-                CenterId id ->
-                    id
+                            Nothing ->
+                                ""
+                    }
+                )
+                families
     in
     Encode.object
-        [ ( "centerId", Encode.string centerIdString )
-        , ( "donor", donorEncoder name email )
-        , ( "familyIds", familyIdListEncoder familyIds )
+        [ ( "donor", donorEncoder name email )
+        , ( "familyCenterIds", familyCenterListEncoder familyCenters )
         ]
 
 
@@ -141,14 +155,17 @@ donorEncoder name email =
         ]
 
 
-familyIdEncoder : FamilyId -> Value
-familyIdEncoder (FamilyId id) =
-    Encode.string id
+familyCenterEncoder : FamilyCenter -> Value
+familyCenterEncoder familyCenter =
+    Encode.object
+        [ ( "familyId", Encode.string familyCenter.familyIdString )
+        , ( "chosenCenterId", Encode.string familyCenter.chosenCenterIdString )
+        ]
 
 
-familyIdListEncoder : List FamilyId -> Value
-familyIdListEncoder familyIds =
-    Encode.list familyIdEncoder familyIds
+familyCenterListEncoder : List FamilyCenter -> Value
+familyCenterListEncoder familyCenters =
+    Encode.list familyCenterEncoder familyCenters
 
 
 genderDecoder : Decoder Gender
@@ -175,6 +192,7 @@ childDecoder =
         |> required "age" int
         |> required "gender" genderDecoder
         |> required "specifics" string
+        |> required "url" maybeStringDecoder
 
 
 childListDecoder : Decoder ChildList
@@ -198,6 +216,7 @@ familyDecoder =
         |> required "id" familyIdDecoder
         |> required "children" childListDecoder
         |> required "placeId" placeIdDecoder
+        |> hardcoded Nothing
 
 
 familyListDecoder : Decoder FamilyList
@@ -216,6 +235,20 @@ keydataApiDecoder =
     Decode.succeed KeydataApi
         |> required "centers" centerListDecoder
         |> required "places" placeListDecoder
+
+
+maybeStringDecoder : Decoder (Maybe String)
+maybeStringDecoder =
+    Decode.string
+        |> Decode.andThen
+            (\s ->
+                case s of
+                    "" ->
+                        Decode.succeed Nothing
+
+                    value ->
+                        Decode.succeed (Just value)
+            )
 
 
 placeDecoder : Decoder Place

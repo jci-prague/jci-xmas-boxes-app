@@ -4,6 +4,8 @@ module Center exposing
     , CenterId(..)
     , CenterList
     , failingUniversalCenter
+    , findCenterByCenterId
+    , findGlobalUniversalCenter
     , unpackCenterId
     )
 
@@ -36,6 +38,30 @@ type alias Center =
 
 type alias CenterList =
     List Center
+
+
+findGlobalUniversalCenter : CenterList -> Center
+findGlobalUniversalCenter centers =
+    centers
+        |> List.filter (\center -> center.globalUniversal == True)
+        |> List.head
+        |> Maybe.withDefault failingUniversalCenter
+
+
+findCenterByCenterId : CenterList -> CenterId -> Center
+findCenterByCenterId centers centerId =
+    let
+        maybeCenter =
+            centers
+                |> List.filter (\c -> c.centerId == centerId)
+                |> List.head
+    in
+    case maybeCenter of
+        Just center ->
+            center
+
+        Nothing ->
+            failingUniversalCenter
 
 
 failingUniversalCenter : Center

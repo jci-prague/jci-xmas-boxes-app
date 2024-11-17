@@ -7,6 +7,7 @@ import Center
         , CenterId(..)
         , CenterList
         , failingUniversalCenter
+        , findGlobalUniversalCenter
         )
 import GlobalCenter
     exposing
@@ -42,8 +43,20 @@ import Views
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        CenterOptionChosen centerId ->
-            ( { model | selectedCenterId = Just (CenterId centerId) }
+        CenterOptionChosen familyId centerId ->
+            let
+                newSelectedFamilies =
+                    List.map
+                        (\fam ->
+                            if fam.familyId == familyId then
+                                { fam | chosenCenter = Just (CenterId centerId) }
+
+                            else
+                                fam
+                        )
+                        model.selectedFamilies
+            in
+            ( { model | selectedFamilies = newSelectedFamilies }
             , Cmd.none
             )
 
@@ -307,7 +320,11 @@ update msg model =
 
 addToSelectedFamilies : Model -> FamilyId -> FamilyList
 addToSelectedFamilies model familyId =
-    findFamilyById model.families familyId :: model.selectedFamilies
+    let
+        familyToBeAdded =
+            findFamilyById model.families familyId
+    in
+    { familyToBeAdded | chosenCenter = Just familyToBeAdded.centerId } :: model.selectedFamilies
 
 
 removeFromSelectedFamilies : Model -> FamilyId -> FamilyList
@@ -366,6 +383,7 @@ findFamilyById families familyId =
             , familyId = familyId
             , children = []
             , placeId = PlaceId ""
+            , chosenCenter = Nothing
             }
 
 
@@ -456,14 +474,6 @@ findSuitableCentersFromSelectedFamilies globalCenter selectedFamilies selectable
             [ chosenCenterForPlace ]
 
 
-findGlobalUniversalCenter : CenterList -> Center
-findGlobalUniversalCenter centers =
-    centers
-        |> List.filter (\center -> center.globalUniversal == True)
-        |> List.head
-        |> Maybe.withDefault failingUniversalCenter
-
-
 view : Model -> Html Msg
 view model =
     if model.appState == Start then
@@ -543,12 +553,7 @@ postDonor model =
             model.selectedFamilies
     in
     if name /= "" && email /= "" then
-        case model.selectedCenterId of
-            Just centerId ->
-                postGift families name email centerId
-
-            Nothing ->
-                Cmd.none
+        postGift families name email
 
     else
         Cmd.none
