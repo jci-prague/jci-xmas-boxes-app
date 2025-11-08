@@ -161,22 +161,8 @@ viewPlacesToggleButtons families places =
                     )
                 |> List.map
                     (\place ->
-                        let
-                            btnState =
-                                if place.active then
-                                    "btn-primary city-btn"
-
-                                else
-                                    "btn-outline-primary city-btn"
-                        in
-                        button [ class ("col btn " ++ btnState), onClick (PlaceToggle place.placeId) ]
-                            [ if place.active then
-                                i [ class "fa fa-check-circle" ] []
-
-                              else
-                                i [ class "fa fa-ban" ] []
-                            , text (" " ++ place.name)
-                            ]
+                        button [ class "col btn", onClick (PlaceToggle place.placeId) ]
+                            [ text place.name ]
                     )
     in
     rowLabel :: placeToggleButtons
