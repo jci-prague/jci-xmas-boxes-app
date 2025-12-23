@@ -136,7 +136,15 @@ filterFormView model =
                     ]
                 ]
             , div [ class "row" ]
-                [ div [ class "col" ] [ text "Můžeš obdarovat jedno dítě, sourozence (skupina dětí se společným tlačítkem 'Vybrat') nebo i více dětí najednou. Tvoje vybrané děti se objevují ve formuláři pod seznamem. Po kliknutí na tlačítko VYBRAT, odskroluj až úplně dolů a dokonči proces vyplněním formuláře a klinutím na tlačítko OBDAROVAT. Po úspěšné odeslání Ti bude obratem zaslán e-mail se všemi informacemi." ]
+                [ div [ class "col" ]
+                    [ text "Můžeš obdarovat jedno dítě, sourozence (skupina dětí se společným tlačítkem "
+                    , b [] [ text "'VYBRAT'" ]
+                    , text " nebo i více dětí najednou. Tvoje vybrané děti se objevují ve formuláři pod seznamem. Po kliknutí na tlačítko "
+                    , b [] [ text "'VYBRAT'" ]
+                    , text ", odskroluj až úplně dolů a dokonči proces vyplněním formuláře a klinutím na tlačítko "
+                    , b [] [ text "'OBDAROVAT'" ]
+                    , text ". Po úspěšné odeslání Ti bude obratem zaslán e-mail se všemi informacemi."
+                    ]
                 ]
             ]
 
