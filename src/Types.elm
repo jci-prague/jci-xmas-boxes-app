@@ -126,6 +126,7 @@ type Msg
     | PlaceToggle PlaceId
     | PostDonorResponse (Result Http.Error PostGiftApiType)
     | RemoveFamilyFromSelected FamilyId
+    | ResetForm
     | SendReservation
     | SetBottomThreshold String
     | SetTopThreshold String

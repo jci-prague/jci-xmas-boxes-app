@@ -55,6 +55,9 @@ minBottomThreshold =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        ResetForm ->
+            ( { model | appState = Start }, Cmd.none )
+
         CenterOptionChosen familyId centerId ->
             let
                 newSelectedFamilies =

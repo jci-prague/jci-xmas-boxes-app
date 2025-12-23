@@ -41,6 +41,7 @@ import Html.Attributes
         , name
         , placeholder
         , selected
+        , style
         , target
         , type_
         , value
@@ -77,7 +78,9 @@ filterFormView model =
         div []
             [ div [ class "row form-group" ]
                 [ div [ class "col-3" ] [ text "Vybrané město" ]
-                , div [ class "col-9" ] [ viewActivePlace model ]
+                , div [ class "col-3" ] [ viewActivePlace model ]
+                , div [ class "col-6" ]
+                    [ a [ onClick ResetForm, style "cursor" "pointer" ] [ text "Změnit město" ] ]
                 ]
             , div [ class "row form-group" ]
                 [ span [ class "col-3" ] [ text "Věk od" ]
