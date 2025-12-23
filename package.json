@@ -7,7 +7,7 @@
     "build:admin": "elm make --output=admin-app.js --optimize src/AdminMain.elm",
     "format": "npx elm-format src/* --yes",
     "run:dev": "elm-live src/Main.elm --dir=./  --start-page=index.html -- --output=choose-kid-form.js",
-    "run:dev:debug": "elm-live src/Main.elm --dir=./ --start-page=index.html -- --output=choose-kid-form.js --debug",
+    "run:dev:debug": "elm-live src/Main.elm --dir=./ --start-page=index.html -- --output=choose-kid-form.js --debug"
   },
   "repository": {
     "type": "git",

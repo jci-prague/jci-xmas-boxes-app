@@ -42,6 +42,16 @@ import Views
         )
 
 
+maxTopThreshold : Int
+maxTopThreshold =
+    20
+
+
+minBottomThreshold : Int
+minBottomThreshold =
+    1
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -69,17 +79,25 @@ update msg model =
             )
 
         SetBottomThreshold threshold ->
+            let
+                newThreshold =
+                    Maybe.withDefault minBottomThreshold (String.toInt threshold)
+            in
             ( { model
-                | bottomThreshold = threshold
-                , viewableFamilies = filterViewableFamilies threshold model.topThreshold model.selectedGender model.places model.families model.selectedFamilies
+                | bottomThreshold = newThreshold
+                , viewableFamilies = filterViewableFamilies newThreshold model.topThreshold model.selectedGender model.places model.families model.selectedFamilies
               }
             , Cmd.none
             )
 
         SetTopThreshold threshold ->
+            let
+                newThreshold =
+                    Maybe.withDefault maxTopThreshold (String.toInt threshold)
+            in
             ( { model
-                | topThreshold = threshold
-                , viewableFamilies = filterViewableFamilies model.bottomThreshold threshold model.selectedGender model.places model.families model.selectedFamilies
+                | topThreshold = newThreshold
+                , viewableFamilies = filterViewableFamilies model.bottomThreshold newThreshold model.selectedGender model.places model.families model.selectedFamilies
               }
             , Cmd.none
             )
@@ -530,7 +548,7 @@ initialModel : () -> ( Model, Cmd Msg )
 initialModel _ =
     ( { agreement = False
       , appState = Start
-      , bottomThreshold = 1
+      , bottomThreshold = minBottomThreshold
       , centers = []
       , donorEmail = Maybe.Nothing
       , donorEmail2 = Maybe.Nothing
@@ -546,7 +564,7 @@ initialModel _ =
       , selectedCenterId = Nothing
       , selectedFamilies = []
       , successMessage = Maybe.Nothing
-      , topThreshold = 19
+      , topThreshold = maxTopThreshold
       , viewableFamilies = []
       }
     , Cmd.batch [ fetchKeydata, fetchFamilies ]

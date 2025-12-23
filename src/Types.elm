@@ -127,8 +127,8 @@ type Msg
     | PostDonorResponse (Result Http.Error PostGiftApiType)
     | RemoveFamilyFromSelected FamilyId
     | SendReservation
-    | SetBottomThreshold Int
-    | SetTopThreshold Int
+    | SetBottomThreshold String
+    | SetTopThreshold String
     | SetGender Gender
     | ToggleAgreement
     | UpdateEmail String

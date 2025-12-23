@@ -37,6 +37,7 @@ import Html.Attributes
         , disabled
         , for
         , href
+        , id
         , name
         , placeholder
         , selected
@@ -75,50 +76,60 @@ filterFormView model =
     else
         div []
             [ div [ class "row form-group" ]
-                [ div [ class "col-2" ] [ text "Vybrané město" ]
-                , div [ class "col-10" ] [ viewActivePlace model ]
+                [ div [ class "col-3" ] [ text "Vybrané město" ]
+                , div [ class "col-9" ] [ viewActivePlace model ]
                 ]
             , div [ class "row form-group" ]
-                [ span [ class "col" ] [ text "Věk od" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.bottomThreshold 1), onClick (SetBottomThreshold 1) ] [ text "1" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.bottomThreshold 2), onClick (SetBottomThreshold 2) ] [ text "2" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.bottomThreshold 3), onClick (SetBottomThreshold 3) ] [ text "3" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.bottomThreshold 4), onClick (SetBottomThreshold 4) ] [ text "4" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.bottomThreshold 5), onClick (SetBottomThreshold 5) ] [ text "5" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.bottomThreshold 6), onClick (SetBottomThreshold 6) ] [ text "6" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.bottomThreshold 7), onClick (SetBottomThreshold 7) ] [ text "7" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.bottomThreshold 8), onClick (SetBottomThreshold 8) ] [ text "8" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.bottomThreshold 9), onClick (SetBottomThreshold 9) ] [ text "9" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.bottomThreshold 10), onClick (SetBottomThreshold 10) ] [ text "10" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.bottomThreshold 11), onClick (SetBottomThreshold 11) ] [ text "11" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.bottomThreshold 12), onClick (SetBottomThreshold 12) ] [ text "12" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.bottomThreshold 13), onClick (SetBottomThreshold 13) ] [ text "13" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.bottomThreshold 14), onClick (SetBottomThreshold 14) ] [ text "14" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.bottomThreshold 15), onClick (SetBottomThreshold 15) ] [ text "15" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.bottomThreshold 16), onClick (SetBottomThreshold 16) ] [ text "16" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.bottomThreshold 17), onClick (SetBottomThreshold 17) ] [ text "17" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.bottomThreshold 18), onClick (SetBottomThreshold 18) ] [ text "18" ]
+                [ span [ class "col-3" ] [ text "Věk od" ]
+                , span [ class "col-9" ]
+                    [ select [ id "bottom-threshold", onInput SetBottomThreshold ]
+                        [ option [ value "1", selected True ] [ text "1" ]
+                        , option [ value "2" ] [ text "2" ]
+                        , option [ value "3" ] [ text "3" ]
+                        , option [ value "4" ] [ text "4" ]
+                        , option [ value "5" ] [ text "5" ]
+                        , option [ value "6" ] [ text "6" ]
+                        , option [ value "7" ] [ text "7" ]
+                        , option [ value "8" ] [ text "8" ]
+                        , option [ value "9" ] [ text "9" ]
+                        , option [ value "10" ] [ text "10" ]
+                        , option [ value "11" ] [ text "11" ]
+                        , option [ value "12" ] [ text "12" ]
+                        , option [ value "13" ] [ text "13" ]
+                        , option [ value "14" ] [ text "14" ]
+                        , option [ value "15" ] [ text "15" ]
+                        , option [ value "16" ] [ text "16" ]
+                        , option [ value "17" ] [ text "17" ]
+                        , option [ value "18" ] [ text "18" ]
+                        , option [ value "19" ] [ text "19" ]
+                        ]
+                    ]
                 ]
             , div [ class "row form-group" ]
-                [ span [ class "col" ] [ text "Věk do" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 2), onClick (SetTopThreshold 2) ] [ text "2" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 3), onClick (SetTopThreshold 3) ] [ text "3" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 4), onClick (SetTopThreshold 4) ] [ text "4" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 5), onClick (SetTopThreshold 5) ] [ text "5" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 6), onClick (SetTopThreshold 6) ] [ text "6" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 7), onClick (SetTopThreshold 7) ] [ text "7" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 8), onClick (SetTopThreshold 8) ] [ text "8" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 9), onClick (SetTopThreshold 9) ] [ text "9" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 10), onClick (SetTopThreshold 10) ] [ text "10" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 11), onClick (SetTopThreshold 11) ] [ text "11" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 12), onClick (SetTopThreshold 12) ] [ text "12" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 13), onClick (SetTopThreshold 13) ] [ text "13" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 14), onClick (SetTopThreshold 14) ] [ text "14" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 15), onClick (SetTopThreshold 15) ] [ text "15" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 16), onClick (SetTopThreshold 16) ] [ text "16" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 17), onClick (SetTopThreshold 17) ] [ text "17" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 18), onClick (SetTopThreshold 18) ] [ text "18" ]
-                , button [ class ("col btn " ++ isButtonEqualTreshold model.topThreshold 19), onClick (SetTopThreshold 19) ] [ text "19" ]
+                [ span [ class "col-3" ] [ text "Věk do" ]
+                , span [ class "col-9" ]
+                    [ select [ id "top-threshold", onInput SetTopThreshold ]
+                        [ option [ value "2" ] [ text "2" ]
+                        , option [ value "3" ] [ text "3" ]
+                        , option [ value "4" ] [ text "4" ]
+                        , option [ value "5" ] [ text "5" ]
+                        , option [ value "6" ] [ text "6" ]
+                        , option [ value "7" ] [ text "7" ]
+                        , option [ value "8" ] [ text "8" ]
+                        , option [ value "9" ] [ text "9" ]
+                        , option [ value "10" ] [ text "10" ]
+                        , option [ value "11" ] [ text "11" ]
+                        , option [ value "12" ] [ text "12" ]
+                        , option [ value "13" ] [ text "13" ]
+                        , option [ value "14" ] [ text "14" ]
+                        , option [ value "15" ] [ text "15" ]
+                        , option [ value "16" ] [ text "16" ]
+                        , option [ value "17" ] [ text "17" ]
+                        , option [ value "18" ] [ text "18" ]
+                        , option [ value "19" ] [ text "19" ]
+                        , option [ value "20", selected True ] [ text "20" ]
+                        ]
+                    ]
                 ]
             , div [ class "row form-group" ]
                 [ span [ class "col" ] [ text "Pohlaví" ]
@@ -279,15 +290,6 @@ viewMessagePane model =
 
                 Nothing ->
                     div [] []
-
-
-isButtonEqualTreshold : Int -> Int -> String
-isButtonEqualTreshold currentTreshold buttonTreshold =
-    if currentTreshold == buttonTreshold then
-        "btn-primary"
-
-    else
-        "btn-outline-primary"
 
 
 isGenderEqualSelected : Gender -> Gender -> Bool
