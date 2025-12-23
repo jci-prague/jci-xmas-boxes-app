@@ -8,7 +8,6 @@
     "format": "npx elm-format src/* --yes",
     "run:dev": "elm-live src/Main.elm --dir=./  --start-page=index.html -- --output=choose-kid-form.js",
     "run:dev:debug": "elm-live src/Main.elm --dir=./ --start-page=index.html -- --output=choose-kid-form.js --debug",
-    "run:admin:dev:debug": "elm-live src/AdminMain.elm --dir=./ --start-page=admin.html -- --output=admin-app.js --debug"
   },
   "repository": {
     "type": "git",
